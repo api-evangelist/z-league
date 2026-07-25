@@ -1,0 +1,365 @@
+openapi: 3.1.0
+info:
+  title: MEGA Public CRM Lead Leads Webhooks API
+  version: 1.0.0
+  description: 'Server-to-server API to pull leads, push leads (single + bulk), and manage lead webhooks for your MEGA CRM. Authenticate with an admin-issued Personal Access Token (`Authorization: Bearer mega_...`) plus the `x-customer-id` header. These are secret-key endpoints — call them from your backend, never from a browser.'
+servers:
+- url: https://app.gomega.ai
+  description: Production
+security:
+- bearerAuth: []
+tags:
+- name: Webhooks
+paths:
+  /api/agents/crm/lead-webhooks:
+    get:
+      operationId: listWebhooks
+      summary: List webhooks
+      description: Lists the caller's registered lead webhooks. Signing secrets are never returned. Requires the `public_api:webhooks:manage` scope.
+      tags:
+      - Webhooks
+      parameters:
+      - $ref: '#/components/parameters/CustomerId'
+      responses:
+        '200':
+          description: The caller's webhooks.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  webhooks:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Webhook'
+                required:
+                - webhooks
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+    post:
+      operationId: createWebhook
+      summary: Register a webhook
+      description: Registers a webhook URL for `lead.created` events. The URL is SSRF-validated (must be public HTTPS). The signing `secret` is returned EXACTLY ONCE — store it. Requires the `public_api:webhooks:manage` scope.
+      tags:
+      - Webhooks
+      parameters:
+      - $ref: '#/components/parameters/CustomerId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookCreateRequest'
+      responses:
+        '201':
+          description: The created webhook + its signing secret (shown once).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  webhook:
+                    $ref: '#/components/schemas/Webhook'
+                  secret:
+                    type: string
+                    description: HMAC signing secret (`mega_whsec_...`). Shown only on creation.
+                required:
+                - webhook
+                - secret
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /api/agents/crm/lead-webhooks/{id}:
+    patch:
+      operationId: updateWebhook
+      summary: Update / rotate a webhook
+      description: 'Updates a webhook. Set `rotate_secret: true` to mint a fresh signing secret (returned once). Requires the `public_api:webhooks:manage` scope.'
+      tags:
+      - Webhooks
+      parameters:
+      - $ref: '#/components/parameters/CustomerId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WebhookUpdateRequest'
+      responses:
+        '200':
+          description: The updated webhook (with `secret` only when rotated).
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  webhook:
+                    $ref: '#/components/schemas/Webhook'
+                  secret:
+                    type: string
+                required:
+                - webhook
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+    delete:
+      operationId: deleteWebhook
+      summary: Delete a webhook
+      description: Soft-deletes a webhook. Requires the `public_api:webhooks:manage` scope.
+      tags:
+      - Webhooks
+      parameters:
+      - $ref: '#/components/parameters/CustomerId'
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Deleted.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deleted:
+                    type: boolean
+                required:
+                - deleted
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+components:
+  parameters:
+    CustomerId:
+      name: x-customer-id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The customer this request acts on. Must match the customer your key is locked to.
+  headers:
+    RateLimitReset:
+      description: Seconds until the window fully refills.
+      schema:
+        type: integer
+    RetryAfter:
+      description: Seconds to wait before retrying (on 429).
+      schema:
+        type: integer
+    RateLimitRemaining:
+      description: Requests remaining in the window.
+      schema:
+        type: integer
+    RateLimitLimit:
+      description: Request quota for the reported window.
+      schema:
+        type: integer
+  schemas:
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+          format: uri
+        event_types:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+        timeout_seconds:
+          type: integer
+        retry_attempts:
+          type: integer
+        description:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - url
+      - event_types
+      - is_active
+      - timeout_seconds
+      - retry_attempts
+      - created_at
+      - updated_at
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - authentication_error
+              - authorization_error
+              - invalid_request_error
+              - not_found_error
+              - rate_limit_error
+              - api_error
+            code:
+              type: integer
+            message:
+              type: string
+          required:
+          - type
+          - code
+          - message
+      required:
+      - error
+    WebhookCreateRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public HTTPS URL. Validated against SSRF before it is stored.
+        event_types:
+          type: array
+          items:
+            type: string
+            enum:
+            - lead.created
+          default:
+          - lead.created
+        timeout_seconds:
+          type: integer
+          minimum: 1
+          maximum: 60
+          default: 10
+        retry_attempts:
+          type: integer
+          minimum: 0
+          maximum: 10
+          default: 5
+        description:
+          type:
+          - string
+          - 'null'
+        is_active:
+          type: boolean
+          default: true
+      required:
+      - url
+    WebhookUpdateRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        event_types:
+          type: array
+          items:
+            type: string
+            enum:
+            - lead.created
+        timeout_seconds:
+          type: integer
+          minimum: 1
+          maximum: 60
+        retry_attempts:
+          type: integer
+          minimum: 0
+          maximum: 10
+        description:
+          type:
+          - string
+          - 'null'
+        is_active:
+          type: boolean
+        rotate_secret:
+          type: boolean
+          description: When true, a fresh signing secret is minted and returned once.
+  responses:
+    Unauthorized:
+      description: Missing or invalid token / `x-customer-id`.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Key lacks the required scope, or is locked to a different customer.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Idempotency-Key reused with a different body, or duplicate resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Rate limit exceeded.
+      headers:
+        RateLimit-Limit:
+          $ref: '#/components/headers/RateLimitLimit'
+        RateLimit-Remaining:
+          $ref: '#/components/headers/RateLimitRemaining'
+        RateLimit-Reset:
+          $ref: '#/components/headers/RateLimitReset'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: 'Admin-issued Personal Access Token, e.g. `Authorization: Bearer mega_<64 hex>`. The key carries scopes (`public_api:leads:read`, `public_api:leads:write`, `public_api:webhooks:manage`) and is locked to one customer.'
