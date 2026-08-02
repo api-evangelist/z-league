@@ -1,0 +1,17 @@
+generated: '2026-07-21'
+method: searched
+source: https://docs.gomega.ai/changelog
+api: MEGA Public CRM Lead API
+scheme: dated
+current_version: '1.0.0'
+entries:
+- version: '1.0.0'
+  date: '2026-07'
+  label: Initial public release
+  breaking: false
+  highlights:
+  - Pull — GET /api/agents/crm/leads with status/stage/search/date filters, lead_line, optional custom_fields, and cursor (keyset) pagination via next_cursor.
+  - Push — POST /api/agents/crm/leads (single) and POST /api/agents/crm/leads/bulk (up to 500 rows, dry_run, on_duplicate, per-row results, unknown_custom_fields), both idempotent via Idempotency-Key.
+  - Webhooks — register/list/update/delete lead webhooks; HMAC-SHA256 signed lead.created deliveries (X-Mega-Signature / X-Mega-Timestamp / X-Mega-Delivery) with retries and SSRF-validated URLs.
+  - Rate limits — RateLimit-* headers on every response and 429 + Retry-After on overage (60/min + 1,000/hour default; 10/min for bulk).
+  - Scoped, customer-locked keys — public_api:leads:read, public_api:leads:write, public_api:webhooks:manage.

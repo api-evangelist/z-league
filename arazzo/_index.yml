@@ -1,0 +1,12 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/z-league-crm-lead-openapi.json
+workflows:
+- file: z-league-incremental-lead-sync.yml
+  workflowId: incrementalLeadSync
+  title: MEGA CRM — incremental lead sync
+  summary: List leads then page forward with the returned keyset cursor (updated_at asc).
+- file: z-league-capture-and-notify.yml
+  workflowId: captureAndNotify
+  title: MEGA CRM — capture lead and register webhook
+  summary: Register a lead.created webhook, then create a lead that triggers it (idempotent).

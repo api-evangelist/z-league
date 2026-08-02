@@ -1,0 +1,72 @@
+arazzo: 1.0.1
+info:
+  title: MEGA CRM — capture lead and register webhook
+  version: 1.0.0
+  description: >-
+    Register a lead.created webhook, then create a lead. Real inserts fire the webhook so
+    your endpoint is notified. Uses an Idempotency-Key so the create is retry-safe.
+sourceDescriptions:
+- name: megaCrmLead
+  url: ../openapi/z-league-crm-lead-openapi.json
+  type: openapi
+workflows:
+- workflowId: captureAndNotify
+  summary: Register a webhook, then create a lead that triggers it.
+  inputs:
+    type: object
+    required: [token, customerId, webhookUrl, idempotencyKey]
+    properties:
+      token: {type: string, description: 'Bearer PAT (mega_...) with leads:write + webhooks:manage'}
+      customerId: {type: string, format: uuid}
+      webhookUrl: {type: string, description: Public HTTPS endpoint to receive lead.created}
+      idempotencyKey: {type: string}
+      contactEmail: {type: string, default: sam@example.com}
+      contactName: {type: string, default: Sam Seller}
+  steps:
+  - stepId: registerWebhook
+    description: Register a lead.created webhook and capture the signing secret (shown once).
+    operationId: createWebhook
+    parameters:
+    - name: Authorization
+      in: header
+      value: 'Bearer $inputs.token'
+    - name: x-customer-id
+      in: header
+      value: $inputs.customerId
+    requestBody:
+      contentType: application/json
+      payload:
+        url: $inputs.webhookUrl
+        event_types: [lead.created]
+    successCriteria:
+    - condition: $statusCode == 201
+    outputs:
+      webhookId: $response.body#/webhook/id
+      secret: $response.body#/secret
+  - stepId: createLead
+    description: Create a lead; a genuine new insert fires the registered webhook.
+    operationId: createLead
+    parameters:
+    - name: Authorization
+      in: header
+      value: 'Bearer $inputs.token'
+    - name: x-customer-id
+      in: header
+      value: $inputs.customerId
+    - name: Idempotency-Key
+      in: header
+      value: $inputs.idempotencyKey
+    requestBody:
+      contentType: application/json
+      payload:
+        contact_name: $inputs.contactName
+        contact_email: $inputs.contactEmail
+        source_platform: referral
+        source_type: form
+    successCriteria:
+    - condition: $statusCode == 201
+    outputs:
+      leadId: $response.body#/lead/id
+  outputs:
+    webhookId: $steps.registerWebhook.outputs.webhookId
+    leadId: $steps.createLead.outputs.leadId

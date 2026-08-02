@@ -1,0 +1,35 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/z-league-crm-lead-openapi.json
+api: MEGA Public CRM Lead API
+standards:
+- id: openapi-3.1
+  conforms: true
+  evidence: Spec is OpenAPI 3.1.0.
+- id: http-bearer-auth
+  conforms: true
+  evidence: securitySchemes bearerAuth (type http, scheme bearer).
+- id: oauth2
+  conforms: false
+  evidence: Auth is an admin-issued PAT, not an OAuth2 flow.
+- id: rfc9457-problem-details
+  conforms: false
+  evidence: 'Errors use a custom { error: { type, code, message } } envelope, not application/problem+json.'
+- id: idempotency-key
+  conforms: true
+  evidence: Idempotency-Key header on createLead and bulkImportLeads with replay semantics.
+- id: cursor-pagination
+  conforms: true
+  evidence: Keyset next_cursor pagination on listLeads.
+- id: ietf-ratelimit-headers
+  conforms: partial
+  evidence: RateLimit-Limit / RateLimit-Remaining / RateLimit-Reset + Retry-After on 429 (draft RateLimit header fields shape).
+- id: hmac-signed-webhooks
+  conforms: true
+  evidence: lead.created deliveries signed X-Mega-Signature HMAC-SHA256 over timestamp.rawBody with a ~5 min replay window.
+- id: ssrf-validated-webhook-urls
+  conforms: true
+  evidence: Webhook URLs must be public HTTPS and are SSRF-validated before storage.
+compliance_program:
+  published: false
+  note: No public trust center / SOC 2 / ISO 27001 / PCI / HIPAA certifications were found during enrichment; no Compliance pointer emitted.

@@ -1,0 +1,43 @@
+generated: '2026-07-21'
+method: derived
+source: openapi/z-league-crm-lead-openapi.json
+api: MEGA Public CRM Lead API
+entities:
+- name: Lead
+  primary_key: id
+  belongs_to: {customer: customer_id}
+  fields: [contact_name, contact_phone, contact_email, source_platform, source_type, status, score, qualified, last_interaction_at, interaction_count, created_at, updated_at]
+- name: Stage
+  primary_key: id
+  slug: slug
+  fields: [name, color]
+- name: Owner
+  primary_key: id
+  fields: [name, role_name]
+  note: A team member of the customer.
+- name: Webhook
+  primary_key: id
+  fields: [url, event_types, is_active, timeout_seconds, retry_attempts, description, created_at, updated_at]
+  note: Signing secret returned only once on create/rotate; never listed.
+- name: CustomFieldMap
+  kind: value-object
+  note: Map of custom-field slug -> scalar (string|number|boolean|null). Reserved slug lead_line (buyer|seller).
+relationships:
+- from: Lead
+  to: Stage
+  kind: has_one
+  via: current_stage
+- from: Lead
+  to: Owner
+  kind: has_one
+  via: owner
+- from: Lead
+  to: CustomFieldMap
+  kind: has_one
+  via: custom_fields
+enums:
+  source_platform: [google_ads, meta_ads, google_organic, direct, referral, hubspot, zoho, ghl, shopify, zenmaid, lead_docket, salesforce]
+  source_type: [form, phone_call, email, chat, sms, manual, import]
+  status: [active, won, lost, nurture, archived]
+  lead_line: [buyer, seller]
+id_notes: Lead/Stage/Owner/Webhook ids are UUID-format strings; webhook ids appear as wh_... and secrets as mega_whsec_... in docs examples.

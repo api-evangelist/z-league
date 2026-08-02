@@ -1,0 +1,22 @@
+generated: '2026-07-21'
+method: searched
+note: >-
+  Probed the /.well-known/ discovery surface on the MEGA/Z League hosts. No documents
+  returned 200; recorded for auditability. (The MEGA developer docs at docs.gomega.ai
+  sit behind Cloudflare Access — zleague.cloudflareaccess.com — so no public llms.txt
+  or well-known catalog is served there.)
+hosts:
+- host: https://app.gomega.ai
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+- host: https://www.gomega.ai
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+- host: https://gomega.ai
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+documents: []

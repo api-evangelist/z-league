@@ -1,0 +1,50 @@
+generated: '2026-07-21'
+method: searched
+source: https://docs.gomega.ai/errors
+derived_from: openapi/z-league-crm-lead-openapi.json
+format: custom
+envelope: '{ "error": { "type": <string>, "code": <int http status>, "message": <string> } }'
+note: >-
+  MEGA does NOT use RFC 9457 application/problem+json. Every endpoint returns the same
+  stable envelope with a machine-readable `type`, the HTTP `code`, and a human `message`.
+problems:
+- status: 400
+  type: invalid_request_error
+  title: Invalid request
+  cause: Malformed body, bad query params, or bulk over the 500-row cap.
+  remediation: Fix the request; retrying unchanged will not help.
+- status: 401
+  type: authentication_error
+  title: Unauthorized
+  cause: Missing/invalid token, or missing x-customer-id.
+  remediation: Check the Bearer token and that the x-customer-id header is present.
+- status: 403
+  type: authorization_error
+  title: Forbidden
+  cause: Key lacks the required scope, or is locked to a different customer.
+  remediation: Ensure the key carries the endpoint's scope and matches the x-customer-id it was issued for.
+- status: 404
+  type: not_found_error
+  title: Not found
+  cause: Resource (e.g. a webhook id) not found.
+  remediation: Verify the resource id.
+- status: 409
+  type: api_error
+  title: Conflict
+  cause: Idempotency-Key reused with a different body, or a duplicate resource.
+  remediation: Reuse an Idempotency-Key only for the identical retry; use a new key for a new operation.
+- status: 429
+  type: rate_limit_error
+  title: Rate limit exceeded
+  cause: Per-key rate limit exceeded.
+  remediation: Honor the Retry-After header (with jitter) before retrying.
+- status: 5xx
+  type: api_error
+  title: Server error
+  cause: Unexpected server error.
+  remediation: Safe to retry with exponential backoff.
+bulk_row_errors:
+  note: >-
+    A bulk request returns 200 with per-row results; a row can be `failed` (e.g. a
+    cross-tenant owner_id or a stage_slug not in the customer's pipeline) without aborting
+    the batch. A whole-request 400 means the request itself was rejected.

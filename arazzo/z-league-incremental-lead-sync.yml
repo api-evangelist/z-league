@@ -1,0 +1,75 @@
+arazzo: 1.0.1
+info:
+  title: MEGA CRM — incremental lead sync
+  version: 1.0.0
+  description: >-
+    Poll the MEGA CRM for leads with stable keyset cursor pagination: fetch the first
+    page sorted by updated_at ascending, then follow next_cursor to fetch the next page.
+sourceDescriptions:
+- name: megaCrmLead
+  url: ../openapi/z-league-crm-lead-openapi.json
+  type: openapi
+workflows:
+- workflowId: incrementalLeadSync
+  summary: List leads then page forward with the returned cursor.
+  description: Uses sort_by=updated_at&sort_dir=asc for stable incremental polling.
+  inputs:
+    type: object
+    required: [token, customerId]
+    properties:
+      token: {type: string, description: 'Bearer PAT (mega_...) with public_api:leads:read'}
+      customerId: {type: string, format: uuid}
+      limit: {type: integer, default: 100}
+  steps:
+  - stepId: firstPage
+    description: Fetch the first page of recently-updated leads.
+    operationId: listLeads
+    parameters:
+    - name: Authorization
+      in: header
+      value: 'Bearer $inputs.token'
+    - name: x-customer-id
+      in: header
+      value: $inputs.customerId
+    - name: sort_by
+      in: query
+      value: updated_at
+    - name: sort_dir
+      in: query
+      value: asc
+    - name: limit
+      in: query
+      value: $inputs.limit
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      nextCursor: $response.body#/next_cursor
+      total: $response.body#/total
+  - stepId: nextPage
+    description: Fetch the next page using next_cursor from the first page (same sort).
+    operationId: listLeads
+    parameters:
+    - name: Authorization
+      in: header
+      value: 'Bearer $inputs.token'
+    - name: x-customer-id
+      in: header
+      value: $inputs.customerId
+    - name: sort_by
+      in: query
+      value: updated_at
+    - name: sort_dir
+      in: query
+      value: asc
+    - name: limit
+      in: query
+      value: $inputs.limit
+    - name: cursor
+      in: query
+      value: $steps.firstPage.outputs.nextCursor
+    successCriteria:
+    - condition: $statusCode == 200
+    outputs:
+      nextCursor: $response.body#/next_cursor
+  outputs:
+    total: $steps.firstPage.outputs.total

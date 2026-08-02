@@ -1,0 +1,42 @@
+generated: '2026-07-21'
+method: derived
+status: candidate
+source: openapi/z-league-crm-lead-openapi.json
+note: >-
+  No official hosted/remote MCP server was found for MEGA / Z League during enrichment.
+  This is a CANDIDATE tool list derived one-tool-per-operation from the MEGA public CRM
+  Lead API OpenAPI, for a future MCP server. Not an authoritative provider claim.
+server:
+  name: mega-crm-lead
+  transport: http
+  url: null
+  auth: Bearer PAT (mega_...) + x-customer-id header
+tools:
+- name: list_leads
+  description: List / search leads with filters and cursor pagination.
+  source_operation: openapi/z-league-crm-lead-openapi.json#listLeads
+  scope: public_api:leads:read
+- name: create_lead
+  description: Create (or merge) a single lead; idempotent via Idempotency-Key.
+  source_operation: openapi/z-league-crm-lead-openapi.json#createLead
+  scope: public_api:leads:write
+- name: bulk_import_leads
+  description: Bulk create/merge up to 500 leads; supports dry_run and on_duplicate.
+  source_operation: openapi/z-league-crm-lead-openapi.json#bulkImportLeads
+  scope: public_api:leads:write
+- name: list_webhooks
+  description: List registered lead webhooks (secrets never returned).
+  source_operation: openapi/z-league-crm-lead-openapi.json#listWebhooks
+  scope: public_api:webhooks:manage
+- name: create_webhook
+  description: Register a lead.created webhook; returns the signing secret once.
+  source_operation: openapi/z-league-crm-lead-openapi.json#createWebhook
+  scope: public_api:webhooks:manage
+- name: update_webhook
+  description: Update / rotate a webhook.
+  source_operation: openapi/z-league-crm-lead-openapi.json#updateWebhook
+  scope: public_api:webhooks:manage
+- name: delete_webhook
+  description: Soft-delete a webhook.
+  source_operation: openapi/z-league-crm-lead-openapi.json#deleteWebhook
+  scope: public_api:webhooks:manage

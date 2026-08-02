@@ -1,0 +1,417 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "MEGA Public CRM Lead API",
+    "version": "1.0.0",
+    "description": "Server-to-server API to pull leads, push leads (single + bulk), and manage lead webhooks for your MEGA CRM. Authenticate with an admin-issued Personal Access Token (`Authorization: Bearer mega_...`) plus the `x-customer-id` header. These are secret-key endpoints — call them from your backend, never from a browser."
+  },
+  "servers": [{ "url": "https://app.gomega.ai", "description": "Production" }],
+  "security": [{ "bearerAuth": [] }],
+  "paths": {
+    "/api/agents/crm/leads": {
+      "get": {
+        "operationId": "listLeads",
+        "summary": "List / search leads",
+        "description": "Returns leads for the authenticated customer. Requires the `public_api:leads:read` scope. Use `sort_by=updated_at&sort_dir=asc` with `cursor` for stable incremental polling.",
+        "tags": ["Leads"],
+        "parameters": [
+          { "$ref": "#/components/parameters/CustomerId" },
+          { "name": "status", "in": "query", "schema": { "type": "string" }, "description": "Filter by lead status (e.g. active, won, lost, nurture, archived)." },
+          { "name": "stageId", "in": "query", "schema": { "type": "string", "format": "uuid" }, "description": "Filter by current pipeline stage id." },
+          { "name": "search", "in": "query", "schema": { "type": "string" }, "description": "Free-text match on name / email / phone (phone-format-agnostic)." },
+          { "name": "created_since", "in": "query", "schema": { "type": "string", "format": "date-time" }, "description": "Only leads created at/after this ISO-8601 timestamp." },
+          { "name": "updated_since", "in": "query", "schema": { "type": "string", "format": "date-time" }, "description": "Only leads updated at/after this ISO-8601 timestamp." },
+          { "name": "sort_by", "in": "query", "schema": { "type": "string", "enum": ["created_at", "updated_at", "last_interaction_at"], "default": "updated_at" } },
+          { "name": "sort_dir", "in": "query", "schema": { "type": "string", "enum": ["asc", "desc"], "default": "asc" } },
+          { "name": "lead_line", "in": "query", "schema": { "type": "string", "enum": ["buyer", "seller"] }, "description": "Filter by the reserved `lead_line` custom field." },
+          { "name": "include_custom_fields", "in": "query", "schema": { "type": "boolean", "default": false }, "description": "When true, include a `custom_fields` object on each lead." },
+          { "name": "cursor", "in": "query", "schema": { "type": "string" }, "description": "Opaque keyset cursor from a previous response's `next_cursor`. Only valid with the same `sort_by`/`sort_dir`." },
+          { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 20 } },
+          { "name": "offset", "in": "query", "schema": { "type": "integer", "minimum": 0, "default": 0 }, "description": "Offset paging (back-compat). Prefer `cursor` for incremental polling." }
+        ],
+        "responses": {
+          "200": {
+            "description": "A page of leads.",
+            "headers": { "RateLimit-Limit": { "$ref": "#/components/headers/RateLimitLimit" }, "RateLimit-Remaining": { "$ref": "#/components/headers/RateLimitRemaining" }, "RateLimit-Reset": { "$ref": "#/components/headers/RateLimitReset" } },
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LeadListResponse" } } }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      },
+      "post": {
+        "operationId": "createLead",
+        "summary": "Create a single lead",
+        "description": "Creates one lead (or merges into an existing lead by email / phone-last-10). Requires the `public_api:leads:write` scope. Send an `Idempotency-Key` so a retry returns the original result instead of double-creating.",
+        "tags": ["Leads"],
+        "parameters": [
+          { "$ref": "#/components/parameters/CustomerId" },
+          { "$ref": "#/components/parameters/IdempotencyKey" }
+        ],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LeadCreateRequest" } } } },
+        "responses": {
+          "201": {
+            "description": "The created (or merged) lead.",
+            "headers": { "RateLimit-Limit": { "$ref": "#/components/headers/RateLimitLimit" }, "RateLimit-Remaining": { "$ref": "#/components/headers/RateLimitRemaining" }, "RateLimit-Reset": { "$ref": "#/components/headers/RateLimitReset" } },
+            "content": { "application/json": { "schema": { "type": "object", "properties": { "lead": { "$ref": "#/components/schemas/Lead" } }, "required": ["lead"] } } }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    },
+    "/api/agents/crm/leads/bulk": {
+      "post": {
+        "operationId": "bulkImportLeads",
+        "summary": "Bulk create / merge leads",
+        "description": "Import up to 500 leads in one request. Requires the `public_api:leads:write` scope. Uploaded leads are inert (no downstream automation). Use `dry_run: true` to preview, `on_duplicate` to control merge behavior, and `Idempotency-Key` to make retries safe. Subject to a stricter per-minute rate limit than the other endpoints.",
+        "tags": ["Leads"],
+        "parameters": [
+          { "$ref": "#/components/parameters/CustomerId" },
+          { "$ref": "#/components/parameters/IdempotencyKey" }
+        ],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BulkImportRequest" } } } },
+        "responses": {
+          "200": {
+            "description": "Per-row import results + summary.",
+            "headers": { "RateLimit-Limit": { "$ref": "#/components/headers/RateLimitLimit" }, "RateLimit-Remaining": { "$ref": "#/components/headers/RateLimitRemaining" }, "RateLimit-Reset": { "$ref": "#/components/headers/RateLimitReset" } },
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BulkImportResponse" } } }
+          },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    },
+    "/api/agents/crm/lead-webhooks": {
+      "get": {
+        "operationId": "listWebhooks",
+        "summary": "List webhooks",
+        "description": "Lists the caller's registered lead webhooks. Signing secrets are never returned. Requires the `public_api:webhooks:manage` scope.",
+        "tags": ["Webhooks"],
+        "parameters": [{ "$ref": "#/components/parameters/CustomerId" }],
+        "responses": {
+          "200": { "description": "The caller's webhooks.", "content": { "application/json": { "schema": { "type": "object", "properties": { "webhooks": { "type": "array", "items": { "$ref": "#/components/schemas/Webhook" } } }, "required": ["webhooks"] } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      },
+      "post": {
+        "operationId": "createWebhook",
+        "summary": "Register a webhook",
+        "description": "Registers a webhook URL for `lead.created` events. The URL is SSRF-validated (must be public HTTPS). The signing `secret` is returned EXACTLY ONCE — store it. Requires the `public_api:webhooks:manage` scope.",
+        "tags": ["Webhooks"],
+        "parameters": [{ "$ref": "#/components/parameters/CustomerId" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WebhookCreateRequest" } } } },
+        "responses": {
+          "201": { "description": "The created webhook + its signing secret (shown once).", "content": { "application/json": { "schema": { "type": "object", "properties": { "webhook": { "$ref": "#/components/schemas/Webhook" }, "secret": { "type": "string", "description": "HMAC signing secret (`mega_whsec_...`). Shown only on creation." } }, "required": ["webhook", "secret"] } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "409": { "$ref": "#/components/responses/Conflict" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    },
+    "/api/agents/crm/lead-webhooks/{id}": {
+      "patch": {
+        "operationId": "updateWebhook",
+        "summary": "Update / rotate a webhook",
+        "description": "Updates a webhook. Set `rotate_secret: true` to mint a fresh signing secret (returned once). Requires the `public_api:webhooks:manage` scope.",
+        "tags": ["Webhooks"],
+        "parameters": [
+          { "$ref": "#/components/parameters/CustomerId" },
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/WebhookUpdateRequest" } } } },
+        "responses": {
+          "200": { "description": "The updated webhook (with `secret` only when rotated).", "content": { "application/json": { "schema": { "type": "object", "properties": { "webhook": { "$ref": "#/components/schemas/Webhook" }, "secret": { "type": "string" } }, "required": ["webhook"] } } } },
+          "400": { "$ref": "#/components/responses/BadRequest" },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      },
+      "delete": {
+        "operationId": "deleteWebhook",
+        "summary": "Delete a webhook",
+        "description": "Soft-deletes a webhook. Requires the `public_api:webhooks:manage` scope.",
+        "tags": ["Webhooks"],
+        "parameters": [
+          { "$ref": "#/components/parameters/CustomerId" },
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }
+        ],
+        "responses": {
+          "200": { "description": "Deleted.", "content": { "application/json": { "schema": { "type": "object", "properties": { "deleted": { "type": "boolean" } }, "required": ["deleted"] } } } },
+          "401": { "$ref": "#/components/responses/Unauthorized" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "429": { "$ref": "#/components/responses/RateLimited" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Admin-issued Personal Access Token, e.g. `Authorization: Bearer mega_<64 hex>`. The key carries scopes (`public_api:leads:read`, `public_api:leads:write`, `public_api:webhooks:manage`) and is locked to one customer."
+      }
+    },
+    "parameters": {
+      "CustomerId": {
+        "name": "x-customer-id",
+        "in": "header",
+        "required": true,
+        "schema": { "type": "string", "format": "uuid" },
+        "description": "The customer this request acts on. Must match the customer your key is locked to."
+      },
+      "IdempotencyKey": {
+        "name": "Idempotency-Key",
+        "in": "header",
+        "required": false,
+        "schema": { "type": "string" },
+        "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409."
+      }
+    },
+    "headers": {
+      "RateLimitLimit": { "description": "Request quota for the reported window.", "schema": { "type": "integer" } },
+      "RateLimitRemaining": { "description": "Requests remaining in the window.", "schema": { "type": "integer" } },
+      "RateLimitReset": { "description": "Seconds until the window fully refills.", "schema": { "type": "integer" } },
+      "RetryAfter": { "description": "Seconds to wait before retrying (on 429).", "schema": { "type": "integer" } }
+    },
+    "responses": {
+      "BadRequest": { "description": "Invalid request.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "Unauthorized": { "description": "Missing or invalid token / `x-customer-id`.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "Forbidden": { "description": "Key lacks the required scope, or is locked to a different customer.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "NotFound": { "description": "Resource not found.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "Conflict": { "description": "Idempotency-Key reused with a different body, or duplicate resource.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+      "RateLimited": {
+        "description": "Rate limit exceeded.",
+        "headers": { "RateLimit-Limit": { "$ref": "#/components/headers/RateLimitLimit" }, "RateLimit-Remaining": { "$ref": "#/components/headers/RateLimitRemaining" }, "RateLimit-Reset": { "$ref": "#/components/headers/RateLimitReset" }, "Retry-After": { "$ref": "#/components/headers/RetryAfter" } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } }
+      }
+    },
+    "schemas": {
+      "Error": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "object",
+            "properties": {
+              "type": { "type": "string", "enum": ["authentication_error", "authorization_error", "invalid_request_error", "not_found_error", "rate_limit_error", "api_error"] },
+              "code": { "type": "integer" },
+              "message": { "type": "string" }
+            },
+            "required": ["type", "code", "message"]
+          }
+        },
+        "required": ["error"]
+      },
+      "SourcePlatform": { "type": "string", "enum": ["google_ads", "meta_ads", "google_organic", "direct", "referral", "hubspot", "zoho", "ghl", "shopify", "zenmaid", "lead_docket", "salesforce"] },
+      "SourceType": { "type": "string", "enum": ["form", "phone_call", "email", "chat", "sms", "manual", "import"] },
+      "CustomFieldMap": {
+        "type": "object",
+        "description": "Map of custom-field slug to a scalar value (string | number | boolean | null).",
+        "additionalProperties": { "type": ["string", "number", "boolean", "null"] }
+      },
+      "Stage": {
+        "type": "object",
+        "nullable": true,
+        "properties": {
+          "id": { "type": "string" },
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "color": { "type": ["string", "null"] }
+        }
+      },
+      "Owner": {
+        "type": ["object", "null"],
+        "properties": {
+          "id": { "type": "string" },
+          "name": { "type": "string" },
+          "role_name": { "type": ["string", "null"] }
+        }
+      },
+      "Lead": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "customer_id": { "type": "string" },
+          "contact_name": { "type": ["string", "null"] },
+          "contact_phone": { "type": ["string", "null"] },
+          "contact_email": { "type": ["string", "null"] },
+          "source_platform": { "type": "string" },
+          "source_type": { "type": "string" },
+          "status": { "type": "string" },
+          "score": { "type": ["integer", "null"] },
+          "qualified": { "type": ["boolean", "null"] },
+          "current_stage": { "$ref": "#/components/schemas/Stage" },
+          "owner": { "$ref": "#/components/schemas/Owner" },
+          "last_interaction_at": { "type": ["string", "null"], "format": "date-time" },
+          "interaction_count": { "type": "integer" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" },
+          "custom_fields": { "$ref": "#/components/schemas/CustomFieldMap" }
+        },
+        "required": ["id", "customer_id", "source_platform", "source_type", "status", "created_at", "updated_at"]
+      },
+      "LeadListResponse": {
+        "type": "object",
+        "properties": {
+          "leads": { "type": "array", "items": { "$ref": "#/components/schemas/Lead" } },
+          "total": { "type": "integer", "description": "Total matching the filter (ignores cursor/offset)." },
+          "limit": { "type": "integer" },
+          "offset": { "type": "integer" },
+          "next_cursor": { "type": ["string", "null"], "description": "Pass as `cursor` to fetch the next page; null when there are no more pages." }
+        },
+        "required": ["leads", "total", "limit", "offset", "next_cursor"]
+      },
+      "LeadCreateRequest": {
+        "type": "object",
+        "description": "At least one of contact_name, contact_phone, contact_email is required.",
+        "properties": {
+          "contact_name": { "type": "string" },
+          "contact_phone": { "type": "string" },
+          "contact_email": { "type": "string", "format": "email" },
+          "source_platform": { "$ref": "#/components/schemas/SourcePlatform" },
+          "source_type": { "$ref": "#/components/schemas/SourceType" },
+          "stage_slug": { "type": "string" },
+          "custom_fields": { "$ref": "#/components/schemas/CustomFieldMap" }
+        }
+      },
+      "BulkLeadRow": {
+        "type": "object",
+        "description": "At least one of contact_name, contact_phone, contact_email is required.",
+        "properties": {
+          "row_ref": { "type": "string", "description": "Your correlation id, echoed back in the per-row result." },
+          "contact_name": { "type": "string" },
+          "contact_phone": { "type": "string" },
+          "contact_email": { "type": "string", "format": "email" },
+          "source_platform": { "$ref": "#/components/schemas/SourcePlatform" },
+          "source_type": { "$ref": "#/components/schemas/SourceType" },
+          "stage_slug": { "type": "string" },
+          "owner_id": { "type": "string", "format": "uuid", "description": "Must be one of the customer's team members." },
+          "lead_line": { "type": "string", "enum": ["buyer", "seller"] },
+          "custom_fields": { "$ref": "#/components/schemas/CustomFieldMap" }
+        }
+      },
+      "BulkImportRequest": {
+        "type": "object",
+        "properties": {
+          "leads": { "type": "array", "minItems": 1, "maxItems": 500, "items": { "$ref": "#/components/schemas/BulkLeadRow" } },
+          "on_duplicate": { "type": "string", "enum": ["update", "skip"], "default": "update" },
+          "dry_run": { "type": "boolean", "default": false }
+        },
+        "required": ["leads"]
+      },
+      "BulkRowResult": {
+        "type": "object",
+        "properties": {
+          "row_ref": { "type": ["string", "null"] },
+          "status": { "type": "string", "enum": ["created", "updated", "skipped", "failed"] },
+          "lead_id": { "type": ["string", "null"] },
+          "matched_by": { "type": ["string", "null"], "enum": ["email", "phone", null] },
+          "errors": { "type": ["array", "null"], "items": { "type": "string" } },
+          "ignored_custom_fields": { "type": "array", "items": { "type": "string" } }
+        },
+        "required": ["row_ref", "status", "lead_id", "matched_by", "errors"]
+      },
+      "BulkImportResponse": {
+        "type": "object",
+        "properties": {
+          "dry_run": { "type": "boolean" },
+          "summary": {
+            "type": "object",
+            "properties": {
+              "total": { "type": "integer" },
+              "created": { "type": "integer" },
+              "updated": { "type": "integer" },
+              "skipped": { "type": "integer" },
+              "failed": { "type": "integer" }
+            },
+            "required": ["total", "created", "updated", "skipped", "failed"]
+          },
+          "results": { "type": "array", "items": { "$ref": "#/components/schemas/BulkRowResult" } },
+          "unknown_custom_fields": { "type": "array", "items": { "type": "string" }, "description": "Custom-field slugs that did not match any definition and were ignored." }
+        },
+        "required": ["dry_run", "summary", "results", "unknown_custom_fields"]
+      },
+      "Webhook": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "url": { "type": "string", "format": "uri" },
+          "event_types": { "type": "array", "items": { "type": "string" } },
+          "is_active": { "type": "boolean" },
+          "timeout_seconds": { "type": "integer" },
+          "retry_attempts": { "type": "integer" },
+          "description": { "type": ["string", "null"] },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        },
+        "required": ["id", "url", "event_types", "is_active", "timeout_seconds", "retry_attempts", "created_at", "updated_at"]
+      },
+      "WebhookCreateRequest": {
+        "type": "object",
+        "properties": {
+          "url": { "type": "string", "format": "uri", "description": "Public HTTPS URL. Validated against SSRF before it is stored." },
+          "event_types": { "type": "array", "items": { "type": "string", "enum": ["lead.created"] }, "default": ["lead.created"] },
+          "timeout_seconds": { "type": "integer", "minimum": 1, "maximum": 60, "default": 10 },
+          "retry_attempts": { "type": "integer", "minimum": 0, "maximum": 10, "default": 5 },
+          "description": { "type": ["string", "null"] },
+          "is_active": { "type": "boolean", "default": true }
+        },
+        "required": ["url"]
+      },
+      "WebhookUpdateRequest": {
+        "type": "object",
+        "properties": {
+          "url": { "type": "string", "format": "uri" },
+          "event_types": { "type": "array", "items": { "type": "string", "enum": ["lead.created"] } },
+          "timeout_seconds": { "type": "integer", "minimum": 1, "maximum": 60 },
+          "retry_attempts": { "type": "integer", "minimum": 0, "maximum": 10 },
+          "description": { "type": ["string", "null"] },
+          "is_active": { "type": "boolean" },
+          "rotate_secret": { "type": "boolean", "description": "When true, a fresh signing secret is minted and returned once." }
+        }
+      },
+      "LeadCreatedWebhookPayload": {
+        "type": "object",
+        "description": "Body POSTed to your webhook URL for a `lead.created` event.",
+        "properties": {
+          "event": { "type": "string", "enum": ["lead.created"] },
+          "delivered_at": { "type": "string", "format": "date-time" },
+          "lead": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "contact_name": { "type": ["string", "null"] },
+              "contact_phone": { "type": ["string", "null"] },
+              "contact_email": { "type": ["string", "null"] },
+              "source_platform": { "type": "string" },
+              "source_type": { "type": "string" },
+              "lead_line": { "type": ["string", "null"] },
+              "current_stage": { "type": ["object", "null"], "properties": { "slug": { "type": "string" }, "name": { "type": "string" } } },
+              "custom_fields": { "$ref": "#/components/schemas/CustomFieldMap" },
+              "created_at": { "type": "string", "format": "date-time" },
+              "updated_at": { "type": "string", "format": "date-time" }
+            },
+            "required": ["id", "source_platform", "source_type", "custom_fields", "created_at", "updated_at"]
+          }
+        },
+        "required": ["event", "delivered_at", "lead"]
+      }
+    }
+  }
+}

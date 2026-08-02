@@ -1,0 +1,28 @@
+generated: '2026-07-21'
+method: searched
+source: https://docs.gomega.ai/rate-limits
+api: MEGA Public CRM Lead API
+scope: per API key (isolated per customer)
+headers:
+- RateLimit-Limit
+- RateLimit-Remaining
+- RateLimit-Reset
+overage:
+  status: 429
+  header: Retry-After
+  body: '{ "error": { "type": "rate_limit_error", "code": 429, "message": "Rate limit exceeded. Please retry later." } }'
+buckets:
+- name: default
+  endpoints: [GET /api/agents/crm/leads, POST /api/agents/crm/leads, lead-webhooks management routes]
+  limit_count: 60
+  window: minute
+  also: 1000 per hour
+- name: bulk
+  endpoints: [POST /api/agents/crm/leads/bulk]
+  limit_count: 10
+  window: minute
+  note: Independent counter from the default bucket.
+overrides: Per-customer overrides available on request via the account manager.
+notes:
+- Internal MEGA traffic is exempt; only customer-facing keys are limited.
+- Best practice — back off on 429 with Retry-After + jitter, poll incrementally with cursor + updated_since, batch writes via bulk.

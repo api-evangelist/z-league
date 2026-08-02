@@ -1,0 +1,21 @@
+generated: '2026-07-21'
+method: generated
+source: openapi/z-league-crm-lead-openapi.json
+api: MEGA Public CRM Lead API
+skills:
+- file: z-league-sync-leads.md
+  name: Incrementally sync leads
+  api: openapi/z-league-crm-lead-openapi.json
+  operations: [listLeads]
+- file: z-league-push-lead.md
+  name: Push a lead safely (idempotent)
+  api: openapi/z-league-crm-lead-openapi.json
+  operations: [createLead]
+- file: z-league-bulk-import.md
+  name: Bulk-import leads
+  api: openapi/z-league-crm-lead-openapi.json
+  operations: [bulkImportLeads]
+- file: z-league-register-webhook.md
+  name: Register and verify a lead.created webhook
+  api: openapi/z-league-crm-lead-openapi.json
+  operations: [createWebhook, listWebhooks, updateWebhook, deleteWebhook]

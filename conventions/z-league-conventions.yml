@@ -1,0 +1,69 @@
+generated: '2026-07-21'
+method: searched
+source: https://docs.gomega.ai
+spec: openapi/z-league-crm-lead-openapi.json
+api: MEGA Public CRM Lead API
+base_url: https://app.gomega.ai
+authentication:
+  style: bearer-pat
+  header: 'Authorization: Bearer mega_<token>'
+  extra_header: x-customer-id
+  scopes: [public_api:leads:read, public_api:leads:write, public_api:webhooks:manage]
+  see: authentication/z-league-authentication.yml
+idempotency:
+  supported: true
+  header: Idempotency-Key
+  scope: per customer + endpoint
+  applies_to: [createLead, bulkImportLeads]
+  behavior: >-
+    Replaying the same key returns the original stored response instead of creating
+    duplicates. Reusing a key with a different request body returns 409. dry_run bulk
+    requests are not idempotency-cached.
+  guidance: Use a fresh unique key (e.g. a UUID) per logical operation; reuse only when retrying that same operation.
+deduplication:
+  keys: [email, phone-last-10]
+  behavior: Incoming leads that match an existing lead are merged rather than duplicated.
+  on_duplicate_bulk: [update, skip]
+pagination:
+  styles: [cursor, offset]
+  preferred: cursor
+  cursor:
+    request_param: cursor
+    response_field: next_cursor
+    kind: keyset (opaque)
+    stability: A cursor is only valid for the same sort_by/sort_dir it was minted under; replaying with a different sort returns 400.
+  offset:
+    params: [limit, offset]
+    note: Back-compat; prefer cursor for incremental polling.
+  limit: {param: limit, default: 20, min: 1, max: 100}
+  incremental_polling: Use sort_by=updated_at&sort_dir=asc and follow next_cursor, or resume with updated_since.
+  total_field: total (count matching the filter, ignores cursor/offset)
+custom_fields:
+  request: Map of custom-field slug -> scalar (string|number|boolean|null)
+  response: Present per lead only when include_custom_fields=true
+  unknown_handling: Unknown slugs are ignored (not silently dropped) and surfaced via ignored_custom_fields / unknown_custom_fields.
+  reserved: [lead_line]
+request_tracing:
+  webhook_delivery_id: X-Mega-Delivery (delivery UUID; de-duplicate at-least-once webhook deliveries on it)
+versioning:
+  scheme: none-explicit
+  spec_version: 1.0.0
+  path_prefix: /api/agents/crm
+  note: Single unversioned production surface; changes tracked via the changelog.
+  see: changelog/z-league-changelog.yml
+error_envelope:
+  shape: '{ error: { type, code, message } }'
+  format: custom (not RFC 9457 / problem+json)
+  types: [authentication_error, authorization_error, invalid_request_error, not_found_error, rate_limit_error, api_error]
+  see: errors/z-league-problem-types.yml
+rate_limit_signaling:
+  headers: [RateLimit-Limit, RateLimit-Remaining, RateLimit-Reset]
+  overage: 429 with Retry-After (seconds)
+  defaults: 60/min + 1000/hour; bulk 10/min (independent counter)
+  see: conventions/z-league-conventions.yml
+webhooks:
+  events: [lead.created]
+  signature: X-Mega-Signature (sha256=<hex>, HMAC-SHA256 over `${timestamp}.${rawBody}`)
+  timestamp_header: X-Mega-Timestamp
+  replay_window: ~5 minutes recommended
+  see: asyncapi/z-league-lead-webhooks.yml

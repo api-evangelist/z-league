@@ -1,0 +1,32 @@
+overlay: 1.0.0
+info:
+  title: API Evangelist enhancements for MEGA Public CRM Lead API
+  version: 1.0.0
+x-provenance:
+  generated: '2026-07-21'
+  method: generated
+  source: openapi/z-league-crm-lead-openapi.json
+extends: openapi/z-league-crm-lead-openapi.json
+actions:
+- target: $.info
+  update:
+    x-apievangelist-provider: z-league
+    x-apievangelist-operating-name: MEGA (gomega.ai)
+    x-apievangelist-backed-by: a16z
+    x-apievangelist-category: crm-leads
+    x-apievangelist-docs: https://docs.gomega.ai
+- target: $.info
+  update:
+    x-apievangelist-conventions:
+      idempotency: Idempotency-Key on createLead + bulkImportLeads
+      pagination: keyset cursor (next_cursor) + offset fallback
+      dedup: email + phone-last-10 merge
+      error_envelope: '{ error: { type, code, message } } (not RFC 9457)'
+      rate_limits: 60/min + 1000/hr default, 10/min bulk; RateLimit-* + Retry-After
+      webhooks: lead.created, HMAC-SHA256 X-Mega-Signature
+- target: $.tags
+  update:
+  - name: Leads
+    description: Pull and push lead records.
+  - name: Webhooks
+    description: Register and manage HMAC-signed lead.created webhooks.

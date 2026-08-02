@@ -1,0 +1,40 @@
+generated: '2026-07-21'
+method: searched
+source: openapi/z-league-crm-lead-openapi.json
+docs: https://docs.gomega.ai/authentication
+summary:
+  types:
+  - http
+  http_schemes:
+  - bearer
+  key_delivery: admin-issued (no self-serve key portal)
+  key_prefix: mega_
+  customer_scoped: true
+  extra_required_header: x-customer-id
+schemes:
+- name: bearerAuth
+  type: http
+  scheme: bearer
+  description: >-
+    Admin-issued Personal Access Token (PAT), e.g. `Authorization: Bearer mega_<64 hex>`.
+    Keys are issued by MEGA and delivered securely (there is no self-serve key portal —
+    request one from your MEGA account manager or support@gomega.ai). Each key is
+    customer-locked (using it with a different x-customer-id returns 403), scoped, and
+    shown only once.
+  sources:
+  - openapi/z-league-crm-lead-openapi.json
+required_headers:
+- name: Authorization
+  value: 'Bearer mega_<token>'
+- name: x-customer-id
+  value: UUID of the customer the request acts on; must match the customer the key is locked to
+scopes:
+- scope: public_api:leads:read
+  grants: GET /api/agents/crm/leads
+- scope: public_api:leads:write
+  grants: POST /api/agents/crm/leads, POST /api/agents/crm/leads/bulk
+- scope: public_api:webhooks:manage
+  grants: The /api/agents/crm/lead-webhooks endpoints (list/create/update/delete)
+notes:
+- Server-to-server only — secret-key endpoints; never call from a browser or mobile client.
+- Missing/invalid token or missing x-customer-id returns 401; missing scope or wrong customer returns 403.

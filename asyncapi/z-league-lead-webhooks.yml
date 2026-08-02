@@ -1,0 +1,35 @@
+generated: '2026-07-21'
+method: searched
+source: https://docs.gomega.ai/webhooks
+type: Webhooks
+api: MEGA Public CRM Lead API
+transport: outbound-http-post
+management:
+  register: POST /api/agents/crm/lead-webhooks
+  list: GET /api/agents/crm/lead-webhooks
+  update: PATCH /api/agents/crm/lead-webhooks/{id}
+  delete: DELETE /api/agents/crm/lead-webhooks/{id}
+  scope: public_api:webhooks:manage
+events:
+- name: lead.created
+  when: A genuine new lead is inserted (not on merges into an existing lead; bulk-uploaded leads do not fire).
+  payload_schema: LeadCreatedWebhookPayload (see openapi/z-league-crm-lead-openapi.json)
+signature:
+  header: X-Mega-Signature
+  algorithm: HMAC-SHA256
+  signed_material: '`${X-Mega-Timestamp}.${rawRequestBody}`'
+  format: sha256=<hex>
+  secret: Returned exactly once at webhook creation (and again only on rotate_secret); prefix mega_whsec_
+  verification: Compute over the RAW request bytes; constant-time compare.
+headers:
+- {name: X-Mega-Signature, meaning: HMAC-SHA256 signature}
+- {name: X-Mega-Timestamp, meaning: Unix seconds, folded into the signature}
+- {name: X-Mega-Delivery, meaning: Delivery UUID; de-duplicate at-least-once retries on it}
+delivery_semantics:
+  ack: Respond 2xx; any non-2xx or timeout is retried.
+  timeout_seconds: {default: 10, min: 1, max: 60}
+  retry_attempts: {default: 5, min: 0, max: 10, total_attempts: retry_attempts + 1}
+  backoff: Exponential, capped at 30s.
+  guarantee: at-least-once
+  terminal: Redirects are not followed; SSRF-blocked URLs are not retried.
+replay_protection: Reject deliveries whose X-Mega-Timestamp is outside a ~5 minute tolerance window.

@@ -1,22 +1,172 @@
 aid: z-league
 name: Z League
-description: Z League is a company surfaced as a portfolio company of a16z and added to the API Evangelist
-  network as a stub for enrichment. This profile is a lead awaiting the enrichment pipeline.
+description: >-
+  Z League is an a16z-backed startup that operates the MEGA platform (gomega.ai)
+  — a suite of AI marketing agents that autonomously manage SEO, paid advertising,
+  and website/growth optimization for businesses at a fraction of traditional
+  agency cost. MEGA also ships a built-in CRM, and exposes the MEGA public CRM Lead
+  API: a server-to-server REST API to pull/search leads with cursor pagination,
+  push leads one-at-a-time or in bulk (up to 500) with idempotency and email/phone
+  de-duplication, and register HMAC-signed `lead.created` webhooks. Authentication
+  is an admin-issued, customer-locked, scoped Personal Access Token (Bearer
+  `mega_...`) plus an `x-customer-id` header. The API is documented with an
+  OpenAPI 3.1 spec and a Mintlify developer portal published from the company's
+  public GitHub org (github.com/zleague).
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  generated: '2026-07-22'
+  method: derived
+image: https://raw.githubusercontent.com/api-evangelist/z-league/refs/heads/main/openapi/z-league-crm-lead-openapi.json
 url: https://raw.githubusercontent.com/api-evangelist/z-league/refs/heads/main/apis.yml
 x-type: company
 x-source: vc-portfolio
 x-backed-by:
 - a16z
-x-tier: stub
-x-tier-reason: portfolio-lead
+x-operating-name: MEGA (gomega.ai)
+x-tier: enriched
+x-tier-reason: real-openapi-and-docs
 specificationVersion: '0.20'
 created: '2026-07-17'
-modified: '2026-07-17'
+modified: '2026-07-21'
 tags:
 - Company
-apis: []
+- CRM
+- Leads
+- Marketing
+- AI Agents
+- SEO
+- Advertising
+- Webhooks
+- Gaming
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
 - FN: APIs.json
   email: info@apis.io
+x-enrichment:
+  date: '2026-07-21'
+  status: enriched
+  artifacts_added: 25
+  pass: local-v1
+apis:
+- aid: z-league:z-league-leads-api
+  name: Z League Leads API
+  description: The Leads API from Z League — 2 operation(s) for leads.
+  humanURL: https://docs.gomega.ai
+  baseURL: https://app.gomega.ai
+  tags:
+  - Leads
+  properties:
+  - type: OpenAPI
+    url: openapi/z-league-leads-api-openapi.yml
+  - type: APIReference
+    url: https://docs.gomega.ai
+  - type: Documentation
+    url: https://docs.gomega.ai
+  - type: GettingStarted
+    url: https://docs.gomega.ai/quickstart
+  - type: Authentication
+    url: authentication/z-league-authentication.yml
+  - type: Conventions
+    url: conventions/z-league-conventions.yml
+  - type: Idempotency
+    url: conventions/z-league-conventions.yml
+  - type: ErrorCatalog
+    url: errors/z-league-problem-types.yml
+  - type: DataModel
+    url: data-model/z-league-data-model.yml
+  - type: Conformance
+    url: conformance/z-league-conformance.yml
+  - type: AsyncAPI
+    url: asyncapi/z-league-lead-webhooks-asyncapi.yml
+  - type: Webhooks
+    url: asyncapi/z-league-lead-webhooks.yml
+  - type: AgenticAccess
+    url: agentic-access/z-league-agentic-access.yml
+- aid: z-league:z-league-webhooks-api
+  name: Z League Webhooks API
+  description: The Webhooks API from Z League — 2 operation(s) for webhooks.
+  humanURL: https://docs.gomega.ai
+  baseURL: https://app.gomega.ai
+  tags:
+  - Webhooks
+  properties:
+  - type: OpenAPI
+    url: openapi/z-league-webhooks-api-openapi.yml
+  - type: APIReference
+    url: https://docs.gomega.ai
+  - type: Documentation
+    url: https://docs.gomega.ai
+  - type: GettingStarted
+    url: https://docs.gomega.ai/quickstart
+  - type: Authentication
+    url: authentication/z-league-authentication.yml
+  - type: Conventions
+    url: conventions/z-league-conventions.yml
+  - type: Idempotency
+    url: conventions/z-league-conventions.yml
+  - type: ErrorCatalog
+    url: errors/z-league-problem-types.yml
+  - type: DataModel
+    url: data-model/z-league-data-model.yml
+  - type: Conformance
+    url: conformance/z-league-conformance.yml
+  - type: AsyncAPI
+    url: asyncapi/z-league-lead-webhooks-asyncapi.yml
+  - type: Webhooks
+    url: asyncapi/z-league-lead-webhooks.yml
+  - type: AgenticAccess
+    url: agentic-access/z-league-agentic-access.yml
+common:
+- type: DeveloperPortal
+  url: https://docs.gomega.ai
+- type: Documentation
+  url: https://docs.gomega.ai
+- type: APIReference
+  url: https://docs.gomega.ai
+- type: GettingStarted
+  url: https://docs.gomega.ai/quickstart
+- type: Website
+  url: https://www.gomega.ai
+- type: Blog
+  url: https://www.gomega.ai/blog/
+- type: Pricing
+  url: https://www.gomega.ai/pricing
+- type: SignUp
+  url: https://www.gomega.ai/megapricing
+- type: Login
+  url: https://app.gomega.ai/
+- type: TermsOfService
+  url: https://www.gomega.ai/legal/terms-of-use
+- type: PrivacyPolicy
+  url: https://www.gomega.ai/legal/privacy-policy
+- type: Support
+  url: mailto:support@gomega.ai
+- type: GitHubOrganization
+  url: https://github.com/zleague
+- type: ChangeLog
+  url: changelog/z-league-changelog.yml
+- type: Lifecycle
+  url: lifecycle/z-league-lifecycle.yml
+- type: RateLimits
+  url: rate-limits/z-league-rate-limits.yml
+- type: LLMsTxt
+  url: llms/z-league-llms.txt
+- type: DomainSecurity
+  url: security/z-league-domain-security.yml
+- type: AgentSkill
+  url: skills/_index.yml
+- type: Arazzo
+  name: Incremental lead sync
+  url: arazzo/z-league-incremental-lead-sync.yml
+- type: Arazzo
+  name: Capture lead and register webhook
+  url: arazzo/z-league-capture-and-notify.yml

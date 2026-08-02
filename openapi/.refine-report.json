@@ -1,0 +1,16 @@
+{
+  "provider": "z-league",
+  "sources": [
+    "z-league-leads-api-openapi.yml",
+    "z-league-webhooks-api-openapi.yml"
+  ],
+  "outputs": [
+    "z-league-leads-api-openapi.yml",
+    "z-league-webhooks-api-openapi.yml"
+  ],
+  "archived": [],
+  "errors": [],
+  "warnings": [],
+  "notes": [],
+  "skipped": []
+}

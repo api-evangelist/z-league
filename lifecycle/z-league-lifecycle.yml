@@ -1,0 +1,23 @@
+generated: '2026-07-21'
+method: searched
+source: https://docs.gomega.ai
+api: MEGA Public CRM Lead API
+versioning:
+  scheme: none-explicit
+  current: '1.0.0'
+  path_prefix: /api/agents/crm
+  docs: https://docs.gomega.ai
+deprecation:
+  policy_url: null
+  sunset_header: false
+  note: No published deprecation/Sunset policy found as of the enrichment date.
+sla:
+  url: null
+  uptime_target: null
+status_page: null
+changelog: https://docs.gomega.ai/changelog
+support: mailto:support@gomega.ai
+deprecated_operations: []
+notes:
+- First public release dated 2026-07 (see changelog/z-league-changelog.yml).
+- No status page or deprecation policy is currently published; StatusPage/Deprecation pointers intentionally omitted.
