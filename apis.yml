@@ -126,6 +126,10 @@ apis:
   - type: AgenticAccess
     url: agentic-access/z-league-agentic-access.yml
 common:
+- type: MCPServer
+  url: mcp/z-league-mcp.yml
+- type: Overlay
+  url: overlays/z-league-crm-lead-overlay.yaml
 - type: DeveloperPortal
   url: https://docs.gomega.ai
 - type: Documentation
