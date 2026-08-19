@@ -1,0 +1,1711 @@
+{
+  "item": [
+    {
+      "id": "fe4f100f-3e6d-407b-a7a6-1a3a116fa655",
+      "name": "Leads",
+      "description": {
+        "content": "",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "3ec377fc-9b18-47eb-ad70-b930ba1e117d",
+          "name": "List / search leads",
+          "request": {
+            "name": "List / search leads",
+            "description": {
+              "content": "Returns leads for the authenticated customer. Requires the `public_api:leads:read` scope. Use `sort_by=updated_at&sort_dir=asc` with `cursor` for stable incremental polling.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "agents",
+                "crm",
+                "leads"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "status",
+                  "value": "<string>",
+                  "description": "Filter by lead status (e.g. active, won, lost, nurture, archived)."
+                },
+                {
+                  "disabled": false,
+                  "key": "stageId",
+                  "value": "<uuid>",
+                  "description": "Filter by current pipeline stage id."
+                },
+                {
+                  "disabled": false,
+                  "key": "search",
+                  "value": "<string>",
+                  "description": "Free-text match on name / email / phone (phone-format-agnostic)."
+                },
+                {
+                  "disabled": false,
+                  "key": "created_since",
+                  "value": "<dateTime>",
+                  "description": "Only leads created at/after this ISO-8601 timestamp."
+                },
+                {
+                  "disabled": false,
+                  "key": "updated_since",
+                  "value": "<dateTime>",
+                  "description": "Only leads updated at/after this ISO-8601 timestamp."
+                },
+                {
+                  "disabled": false,
+                  "key": "sort_by",
+                  "value": "updated_at"
+                },
+                {
+                  "disabled": false,
+                  "key": "sort_dir",
+                  "value": "asc"
+                },
+                {
+                  "disabled": false,
+                  "key": "lead_line",
+                  "value": "<string>",
+                  "description": "Filter by the reserved `lead_line` custom field."
+                },
+                {
+                  "disabled": false,
+                  "key": "include_custom_fields",
+                  "value": "false",
+                  "description": "When true, include a `custom_fields` object on each lead."
+                },
+                {
+                  "disabled": false,
+                  "key": "cursor",
+                  "value": "<string>",
+                  "description": "Opaque keyset cursor from a previous response's `next_cursor`. Only valid with the same `sort_by`/`sort_dir`."
+                },
+                {
+                  "disabled": false,
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "disabled": false,
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Offset paging (back-compat). Prefer `cursor` for incremental polling."
+                }
+              ],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                "key": "x-customer-id",
+                "value": "<uuid>"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "a61eb648-c0e0-442b-b6cf-62fcb2bd2fdd",
+              "name": "A page of leads.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "stageId",
+                      "value": "<uuid>"
+                    },
+                    {
+                      "key": "search",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "created_since",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "updated_since",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "sort_by",
+                      "value": "updated_at"
+                    },
+                    {
+                      "key": "sort_dir",
+                      "value": "asc"
+                    },
+                    {
+                      "key": "lead_line",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "include_custom_fields",
+                      "value": "false"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "disabled": false,
+                  "description": "Request quota for the reported window.",
+                  "key": "RateLimit-Limit",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Requests remaining in the window.",
+                  "key": "RateLimit-Remaining",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Seconds until the window fully refills.",
+                  "key": "RateLimit-Reset",
+                  "value": "5523"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"leads\": [\n    {\n      \"id\": \"string\",\n      \"customer_id\": \"string\",\n      \"source_platform\": \"string\",\n      \"source_type\": \"string\",\n      \"status\": \"string\",\n      \"created_at\": \"1971-06-10T23:20:13.222Z\",\n      \"updated_at\": \"2002-11-03T08:39:55.112Z\",\n      \"contact_name\": \"string\",\n      \"contact_phone\": \"string\",\n      \"contact_email\": \"string\",\n      \"score\": 6255,\n      \"qualified\": false,\n      \"current_stage\": {\n        \"id\": \"string\",\n        \"slug\": \"string\",\n        \"name\": \"string\",\n        \"color\": \"string\"\n      },\n      \"owner\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"role_name\": \"string\"\n      },\n      \"last_interaction_at\": \"2013-06-05T05:51:59.460Z\",\n      \"interaction_count\": 9730,\n      \"custom_fields\": {\n        \"key_0\": true\n      }\n    },\n    {\n      \"id\": \"string\",\n      \"customer_id\": \"string\",\n      \"source_platform\": \"string\",\n      \"source_type\": \"string\",\n      \"status\": \"string\",\n      \"created_at\": \"1950-02-25T00:24:51.004Z\",\n      \"updated_at\": \"2008-06-04T09:54:29.132Z\",\n      \"contact_name\": \"string\",\n      \"contact_phone\": \"string\",\n      \"contact_email\": \"string\",\n      \"score\": 4290,\n      \"qualified\": true,\n      \"current_stage\": {\n        \"id\": \"string\",\n        \"slug\": \"string\",\n        \"name\": \"string\",\n        \"color\": \"string\"\n      },\n      \"owner\": {\n        \"id\": \"string\",\n        \"name\": \"string\",\n        \"role_name\": \"string\"\n      },\n      \"last_interaction_at\": \"1951-10-25T10:09:09.188Z\",\n      \"interaction_count\": 4673,\n      \"custom_fields\": {\n        \"key_0\": \"string\",\n        \"key_1\": \"string\"\n      }\n    }\n  ],\n  \"total\": 2316,\n  \"limit\": 6158,\n  \"offset\": 3390,\n  \"next_cursor\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f7210019-0a95-456a-b822-70b100e04a90",
+              "name": "Invalid request.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "stageId",
+                      "value": "<uuid>"
+                    },
+                    {
+                      "key": "search",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "created_since",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "updated_since",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "sort_by",
+                      "value": "updated_at"
+                    },
+                    {
+                      "key": "sort_dir",
+                      "value": "asc"
+                    },
+                    {
+                      "key": "lead_line",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "include_custom_fields",
+                      "value": "false"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": 410,\n    \"message\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "5362e9b2-ce8d-497f-8781-307d0be2397d",
+              "name": "Missing or invalid token / `x-customer-id`.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "stageId",
+                      "value": "<uuid>"
+                    },
+                    {
+                      "key": "search",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "created_since",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "updated_since",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "sort_by",
+                      "value": "updated_at"
+                    },
+                    {
+                      "key": "sort_dir",
+                      "value": "asc"
+                    },
+                    {
+                      "key": "lead_line",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "include_custom_fields",
+                      "value": "false"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": 410,\n    \"message\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "4f115d5b-24a3-4829-9633-197c01818c7a",
+              "name": "Key lacks the required scope, or is locked to a different customer.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "stageId",
+                      "value": "<uuid>"
+                    },
+                    {
+                      "key": "search",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "created_since",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "updated_since",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "sort_by",
+                      "value": "updated_at"
+                    },
+                    {
+                      "key": "sort_dir",
+                      "value": "asc"
+                    },
+                    {
+                      "key": "lead_line",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "include_custom_fields",
+                      "value": "false"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": 410,\n    \"message\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "8eb73c02-9e83-4bdd-8360-f2071e7d86f7",
+              "name": "Rate limit exceeded.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "status",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "stageId",
+                      "value": "<uuid>"
+                    },
+                    {
+                      "key": "search",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "created_since",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "updated_since",
+                      "value": "<dateTime>"
+                    },
+                    {
+                      "key": "sort_by",
+                      "value": "updated_at"
+                    },
+                    {
+                      "key": "sort_dir",
+                      "value": "asc"
+                    },
+                    {
+                      "key": "lead_line",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "include_custom_fields",
+                      "value": "false"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "offset",
+                      "value": "0"
+                    }
+                  ],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "disabled": false,
+                  "description": "Request quota for the reported window.",
+                  "key": "RateLimit-Limit",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Requests remaining in the window.",
+                  "key": "RateLimit-Remaining",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Seconds until the window fully refills.",
+                  "key": "RateLimit-Reset",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Seconds to wait before retrying (on 429).",
+                  "key": "Retry-After",
+                  "value": "5523"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": 410,\n    \"message\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "261d311e-e933-4d08-8b07-4851953b7fb2",
+          "name": "Create a single lead",
+          "request": {
+            "name": "Create a single lead",
+            "description": {
+              "content": "Creates one lead (or merges into an existing lead by email / phone-last-10). Requires the `public_api:leads:write` scope. Send an `Idempotency-Key` so a retry returns the original result instead of double-creating.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "agents",
+                "crm",
+                "leads"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                "key": "x-customer-id",
+                "value": "<uuid>"
+              },
+              {
+                "disabled": false,
+                "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.",
+                "key": "Idempotency-Key",
+                "value": "<string>"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contact_name\": \"<string>\",\n  \"contact_phone\": \"<string>\",\n  \"contact_email\": \"<email>\",\n  \"source_platform\": \"<string>\",\n  \"source_type\": \"<string>\",\n  \"stage_slug\": \"<string>\",\n  \"custom_fields\": {\n    \"key_0\": \"<string,number,boolean,null>\",\n    \"key_1\": \"<string,number,boolean,null>\",\n    \"key_2\": \"<string,number,boolean,null>\",\n    \"key_3\": \"<string,number,boolean,null>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "cf189280-0064-4c35-9046-54ee2c7bd58d",
+              "name": "The created (or merged) lead.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"contact_name\": \"<string>\",\n  \"contact_phone\": \"<string>\",\n  \"contact_email\": \"<email>\",\n  \"source_platform\": \"referral\",\n  \"source_type\": \"import\",\n  \"stage_slug\": \"<string>\",\n  \"custom_fields\": {\n    \"key_0\": \"string\",\n    \"key_1\": true\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "header": [
+                {
+                  "disabled": false,
+                  "description": "Request quota for the reported window.",
+                  "key": "RateLimit-Limit",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Requests remaining in the window.",
+                  "key": "RateLimit-Remaining",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Seconds until the window fully refills.",
+                  "key": "RateLimit-Reset",
+                  "value": "5523"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"lead\": {\n    \"id\": \"string\",\n    \"customer_id\": \"string\",\n    \"source_platform\": \"string\",\n    \"source_type\": \"string\",\n    \"status\": \"string\",\n    \"created_at\": \"1999-03-08T17:38:21.066Z\",\n    \"updated_at\": \"2021-05-13T09:23:01.155Z\",\n    \"contact_name\": \"string\",\n    \"contact_phone\": \"string\",\n    \"contact_email\": \"string\",\n    \"score\": 6401,\n    \"qualified\": true,\n    \"current_stage\": {\n      \"id\": \"string\",\n      \"slug\": \"string\",\n      \"name\": \"string\",\n      \"color\": \"string\"\n    },\n    \"owner\": {\n      \"id\": \"string\",\n      \"name\": \"string\",\n      \"role_name\": \"string\"\n    },\n    \"last_interaction_at\": \"1952-07-10T18:08:37.137Z\",\n    \"interaction_count\": 2132,\n    \"custom_fields\": {\n      \"key_0\": null\n    }\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "1674d40d-83d9-4d0d-ac27-f17d8f1acb67",
+              "name": "Invalid request.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"contact_name\": \"<string>\",\n  \"contact_phone\": \"<string>\",\n  \"contact_email\": \"<email>\",\n  \"source_platform\": \"referral\",\n  \"source_type\": \"import\",\n  \"stage_slug\": \"<string>\",\n  \"custom_fields\": {\n    \"key_0\": \"string\",\n    \"key_1\": true\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": 410,\n    \"message\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "400876d9-f723-40d8-877a-3a2c1a027b33",
+              "name": "Missing or invalid token / `x-customer-id`.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"contact_name\": \"<string>\",\n  \"contact_phone\": \"<string>\",\n  \"contact_email\": \"<email>\",\n  \"source_platform\": \"referral\",\n  \"source_type\": \"import\",\n  \"stage_slug\": \"<string>\",\n  \"custom_fields\": {\n    \"key_0\": \"string\",\n    \"key_1\": true\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": 410,\n    \"message\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "0e6d41c9-21e0-4333-afb8-6871a5d1813c",
+              "name": "Key lacks the required scope, or is locked to a different customer.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"contact_name\": \"<string>\",\n  \"contact_phone\": \"<string>\",\n  \"contact_email\": \"<email>\",\n  \"source_platform\": \"referral\",\n  \"source_type\": \"import\",\n  \"stage_slug\": \"<string>\",\n  \"custom_fields\": {\n    \"key_0\": \"string\",\n    \"key_1\": true\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": 410,\n    \"message\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "78ba25b8-5dae-4ec4-9ead-427c738cd4d9",
+              "name": "Idempotency-Key reused with a different body, or duplicate resource.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"contact_name\": \"<string>\",\n  \"contact_phone\": \"<string>\",\n  \"contact_email\": \"<email>\",\n  \"source_platform\": \"referral\",\n  \"source_type\": \"import\",\n  \"stage_slug\": \"<string>\",\n  \"custom_fields\": {\n    \"key_0\": \"string\",\n    \"key_1\": true\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": 410,\n    \"message\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "cc2c0116-4902-4068-b3fa-d7beee6bba30",
+              "name": "Rate limit exceeded.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"contact_name\": \"<string>\",\n  \"contact_phone\": \"<string>\",\n  \"contact_email\": \"<email>\",\n  \"source_platform\": \"referral\",\n  \"source_type\": \"import\",\n  \"stage_slug\": \"<string>\",\n  \"custom_fields\": {\n    \"key_0\": \"string\",\n    \"key_1\": true\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "disabled": false,
+                  "description": "Request quota for the reported window.",
+                  "key": "RateLimit-Limit",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Requests remaining in the window.",
+                  "key": "RateLimit-Remaining",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Seconds until the window fully refills.",
+                  "key": "RateLimit-Reset",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Seconds to wait before retrying (on 429).",
+                  "key": "Retry-After",
+                  "value": "5523"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": 410,\n    \"message\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "b213a406-2338-43c0-9e02-980870d17dfb",
+          "name": "Bulk create / merge leads",
+          "request": {
+            "name": "Bulk create / merge leads",
+            "description": {
+              "content": "Import up to 500 leads in one request. Requires the `public_api:leads:write` scope. Uploaded leads are inert (no downstream automation). Use `dry_run: true` to preview, `on_duplicate` to control merge behavior, and `Idempotency-Key` to make retries safe. Subject to a stricter per-minute rate limit than the other endpoints.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "api",
+                "agents",
+                "crm",
+                "leads",
+                "bulk"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "disabled": false,
+                "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                "key": "x-customer-id",
+                "value": "<uuid>"
+              },
+              {
+                "disabled": false,
+                "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.",
+                "key": "Idempotency-Key",
+                "value": "<string>"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"leads\": [\n    {\n      \"row_ref\": \"<string>\",\n      \"contact_name\": \"<string>\",\n      \"contact_phone\": \"<string>\",\n      \"contact_email\": \"<email>\",\n      \"source_platform\": \"<string>\",\n      \"source_type\": \"<string>\",\n      \"stage_slug\": \"<string>\",\n      \"owner_id\": \"<uuid>\",\n      \"lead_line\": \"<string>\",\n      \"custom_fields\": {\n        \"key_0\": \"<string,number,boolean,null>\",\n        \"key_1\": \"<string,number,boolean,null>\",\n        \"key_2\": \"<string,number,boolean,null>\",\n        \"key_3\": \"<string,number,boolean,null>\"\n      }\n    }\n  ],\n  \"on_duplicate\": \"update\",\n  \"dry_run\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "05f31b59-848f-43b2-9eda-6ca80601c56a",
+              "name": "Per-row import results + summary.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads",
+                    "bulk"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"leads\": [\n    {\n      \"row_ref\": \"string\",\n      \"contact_name\": \"string\",\n      \"contact_phone\": \"string\",\n      \"contact_email\": \"ActkgM@jsWLXALmtDQjVslrcXWdKLNsiyS.sz\",\n      \"source_platform\": \"shopify\",\n      \"source_type\": \"sms\",\n      \"stage_slug\": \"string\",\n      \"owner_id\": \"12506f64-a0a5-d475-026a-d51c3df7fda9\",\n      \"lead_line\": \"seller\",\n      \"custom_fields\": {\n        \"key_0\": 2675.7475354635394,\n        \"key_1\": null\n      }\n    }\n  ],\n  \"on_duplicate\": \"update\",\n  \"dry_run\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "disabled": false,
+                  "description": "Request quota for the reported window.",
+                  "key": "RateLimit-Limit",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Requests remaining in the window.",
+                  "key": "RateLimit-Remaining",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Seconds until the window fully refills.",
+                  "key": "RateLimit-Reset",
+                  "value": "5523"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"dry_run\": true,\n  \"summary\": {\n    \"total\": 1019,\n    \"created\": 1520,\n    \"updated\": 7737,\n    \"skipped\": 4923,\n    \"failed\": 471\n  },\n  \"results\": [\n    {\n      \"row_ref\": \"string\",\n      \"status\": \"skipped\",\n      \"lead_id\": \"string\",\n      \"matched_by\": \"phone\",\n      \"errors\": [\n        \"string\",\n        \"string\"\n      ],\n      \"ignored_custom_fields\": [\n        \"string\",\n        \"string\"\n      ]\n    },\n    {\n      \"row_ref\": \"string\",\n      \"status\": \"skipped\",\n      \"lead_id\": \"string\",\n      \"matched_by\": \"null\",\n      \"errors\": [\n        \"string\",\n        \"string\"\n      ],\n      \"ignored_custom_fields\": [\n        \"string\",\n        \"string\"\n      ]\n    }\n  ],\n  \"unknown_custom_fields\": [\n    \"string\",\n    \"string\"\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "e0bbf2ea-206d-4b3b-9070-579411c4c202",
+              "name": "Invalid request.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads",
+                    "bulk"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"leads\": [\n    {\n      \"row_ref\": \"string\",\n      \"contact_name\": \"string\",\n      \"contact_phone\": \"string\",\n      \"contact_email\": \"ActkgM@jsWLXALmtDQjVslrcXWdKLNsiyS.sz\",\n      \"source_platform\": \"shopify\",\n      \"source_type\": \"sms\",\n      \"stage_slug\": \"string\",\n      \"owner_id\": \"12506f64-a0a5-d475-026a-d51c3df7fda9\",\n      \"lead_line\": \"seller\",\n      \"custom_fields\": {\n        \"key_0\": 2675.7475354635394,\n        \"key_1\": null\n      }\n    }\n  ],\n  \"on_duplicate\": \"update\",\n  \"dry_run\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": 410,\n    \"message\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "06e79aa4-e46d-4370-8984-8de30644b84f",
+              "name": "Missing or invalid token / `x-customer-id`.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads",
+                    "bulk"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"leads\": [\n    {\n      \"row_ref\": \"string\",\n      \"contact_name\": \"string\",\n      \"contact_phone\": \"string\",\n      \"contact_email\": \"ActkgM@jsWLXALmtDQjVslrcXWdKLNsiyS.sz\",\n      \"source_platform\": \"shopify\",\n      \"source_type\": \"sms\",\n      \"stage_slug\": \"string\",\n      \"owner_id\": \"12506f64-a0a5-d475-026a-d51c3df7fda9\",\n      \"lead_line\": \"seller\",\n      \"custom_fields\": {\n        \"key_0\": 2675.7475354635394,\n        \"key_1\": null\n      }\n    }\n  ],\n  \"on_duplicate\": \"update\",\n  \"dry_run\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": 410,\n    \"message\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "b5b3de3f-b98c-4e4b-a222-272adc8eb8a4",
+              "name": "Key lacks the required scope, or is locked to a different customer.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads",
+                    "bulk"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"leads\": [\n    {\n      \"row_ref\": \"string\",\n      \"contact_name\": \"string\",\n      \"contact_phone\": \"string\",\n      \"contact_email\": \"ActkgM@jsWLXALmtDQjVslrcXWdKLNsiyS.sz\",\n      \"source_platform\": \"shopify\",\n      \"source_type\": \"sms\",\n      \"stage_slug\": \"string\",\n      \"owner_id\": \"12506f64-a0a5-d475-026a-d51c3df7fda9\",\n      \"lead_line\": \"seller\",\n      \"custom_fields\": {\n        \"key_0\": 2675.7475354635394,\n        \"key_1\": null\n      }\n    }\n  ],\n  \"on_duplicate\": \"update\",\n  \"dry_run\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Forbidden",
+              "code": 403,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": 410,\n    \"message\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "03a05863-1290-4aff-a2eb-4888962c57cd",
+              "name": "Idempotency-Key reused with a different body, or duplicate resource.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads",
+                    "bulk"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"leads\": [\n    {\n      \"row_ref\": \"string\",\n      \"contact_name\": \"string\",\n      \"contact_phone\": \"string\",\n      \"contact_email\": \"ActkgM@jsWLXALmtDQjVslrcXWdKLNsiyS.sz\",\n      \"source_platform\": \"shopify\",\n      \"source_type\": \"sms\",\n      \"stage_slug\": \"string\",\n      \"owner_id\": \"12506f64-a0a5-d475-026a-d51c3df7fda9\",\n      \"lead_line\": \"seller\",\n      \"custom_fields\": {\n        \"key_0\": 2675.7475354635394,\n        \"key_1\": null\n      }\n    }\n  ],\n  \"on_duplicate\": \"update\",\n  \"dry_run\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Conflict",
+              "code": 409,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": 410,\n    \"message\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "86fd624e-e577-498f-8917-04d1f167d914",
+              "name": "Rate limit exceeded.",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "api",
+                    "agents",
+                    "crm",
+                    "leads",
+                    "bulk"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "(Required) The customer this request acts on. Must match the customer your key is locked to.",
+                    "key": "x-customer-id",
+                    "value": "<uuid>"
+                  },
+                  {
+                    "disabled": false,
+                    "description": "Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.",
+                    "key": "Idempotency-Key",
+                    "value": "<string>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"leads\": [\n    {\n      \"row_ref\": \"string\",\n      \"contact_name\": \"string\",\n      \"contact_phone\": \"string\",\n      \"contact_email\": \"ActkgM@jsWLXALmtDQjVslrcXWdKLNsiyS.sz\",\n      \"source_platform\": \"shopify\",\n      \"source_type\": \"sms\",\n      \"stage_slug\": \"string\",\n      \"owner_id\": \"12506f64-a0a5-d475-026a-d51c3df7fda9\",\n      \"lead_line\": \"seller\",\n      \"custom_fields\": {\n        \"key_0\": 2675.7475354635394,\n        \"key_1\": null\n      }\n    }\n  ],\n  \"on_duplicate\": \"update\",\n  \"dry_run\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Too Many Requests",
+              "code": 429,
+              "header": [
+                {
+                  "disabled": false,
+                  "description": "Request quota for the reported window.",
+                  "key": "RateLimit-Limit",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Requests remaining in the window.",
+                  "key": "RateLimit-Remaining",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Seconds until the window fully refills.",
+                  "key": "RateLimit-Reset",
+                  "value": "5523"
+                },
+                {
+                  "disabled": false,
+                  "description": "Seconds to wait before retrying (on 429).",
+                  "key": "Retry-After",
+                  "value": "5523"
+                },
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"error\": {\n    \"type\": \"not_found_error\",\n    \"code\": 410,\n    \"message\": \"string\"\n  }\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://app.gomega.ai",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "9ab0b764-9848-40f3-b9e6-2a1cf5b2e548",
+    "name": "MEGA Public CRM Lead Leads API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "Server-to-server API to pull leads, push leads (single + bulk), and manage lead webhooks for your MEGA CRM. Authenticate with an admin-issued Personal Access Token (`Authorization: Bearer mega_...`) plus the `x-customer-id` header. These are secret-key endpoints — call them from your backend, never from a browser.",
+      "type": "text/plain"
+    }
+  }
+}

@@ -1,0 +1,114 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "MEGA Public CRM Lead Leads Webhooks API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Webhooks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List webhooks",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://app.gomega.ai/api/agents/crm/lead-webhooks",
+            "headers": [
+              {
+                "name": "x-customer-id",
+                "value": ""
+              }
+            ]
+          },
+          "docs": "Lists the caller's registered lead webhooks. Signing secrets are never returned. Requires the `public_api:webhooks:manage` scope."
+        },
+        {
+          "info": {
+            "name": "Register a webhook",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://app.gomega.ai/api/agents/crm/lead-webhooks",
+            "headers": [
+              {
+                "name": "x-customer-id",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Registers a webhook URL for `lead.created` events. The URL is SSRF-validated (must be public HTTPS). The signing `secret` is returned EXACTLY ONCE — store it. Requires the `public_api:webhooks:manage` scope."
+        },
+        {
+          "info": {
+            "name": "Update / rotate a webhook",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://app.gomega.ai/api/agents/crm/lead-webhooks/:id",
+            "headers": [
+              {
+                "name": "x-customer-id",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates a webhook. Set `rotate_secret: true` to mint a fresh signing secret (returned once). Requires the `public_api:webhooks:manage` scope."
+        },
+        {
+          "info": {
+            "name": "Delete a webhook",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://app.gomega.ai/api/agents/crm/lead-webhooks/:id",
+            "headers": [
+              {
+                "name": "x-customer-id",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path"
+              }
+            ]
+          },
+          "docs": "Soft-deletes a webhook. Requires the `public_api:webhooks:manage` scope."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

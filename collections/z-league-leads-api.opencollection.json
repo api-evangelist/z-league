@@ -1,0 +1,162 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "MEGA Public CRM Lead Leads API",
+    "version": "1.0.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Leads",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List / search leads",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://app.gomega.ai/api/agents/crm/leads",
+            "headers": [
+              {
+                "name": "x-customer-id",
+                "value": ""
+              }
+            ],
+            "params": [
+              {
+                "name": "status",
+                "value": "",
+                "type": "query",
+                "description": "Filter by lead status (e.g. active, won, lost, nurture, archived)."
+              },
+              {
+                "name": "stageId",
+                "value": "",
+                "type": "query",
+                "description": "Filter by current pipeline stage id."
+              },
+              {
+                "name": "search",
+                "value": "",
+                "type": "query",
+                "description": "Free-text match on name / email / phone (phone-format-agnostic)."
+              },
+              {
+                "name": "created_since",
+                "value": "",
+                "type": "query",
+                "description": "Only leads created at/after this ISO-8601 timestamp."
+              },
+              {
+                "name": "updated_since",
+                "value": "",
+                "type": "query",
+                "description": "Only leads updated at/after this ISO-8601 timestamp."
+              },
+              {
+                "name": "sort_by",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "sort_dir",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "lead_line",
+                "value": "",
+                "type": "query",
+                "description": "Filter by the reserved `lead_line` custom field."
+              },
+              {
+                "name": "include_custom_fields",
+                "value": "",
+                "type": "query",
+                "description": "When true, include a `custom_fields` object on each lead."
+              },
+              {
+                "name": "cursor",
+                "value": "",
+                "type": "query",
+                "description": "Opaque keyset cursor from a previous response's `next_cursor`. Only valid with the same `sort_by`/`sort_dir`."
+              },
+              {
+                "name": "limit",
+                "value": "",
+                "type": "query"
+              },
+              {
+                "name": "offset",
+                "value": "",
+                "type": "query",
+                "description": "Offset paging (back-compat). Prefer `cursor` for incremental polling."
+              }
+            ]
+          },
+          "docs": "Returns leads for the authenticated customer. Requires the `public_api:leads:read` scope. Use `sort_by=updated_at&sort_dir=asc` with `cursor` for stable incremental polling."
+        },
+        {
+          "info": {
+            "name": "Create a single lead",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://app.gomega.ai/api/agents/crm/leads",
+            "headers": [
+              {
+                "name": "x-customer-id",
+                "value": ""
+              },
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates one lead (or merges into an existing lead by email / phone-last-10). Requires the `public_api:leads:write` scope. Send an `Idempotency-Key` so a retry returns the original result instead of double-creating."
+        },
+        {
+          "info": {
+            "name": "Bulk create / merge leads",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://app.gomega.ai/api/agents/crm/leads/bulk",
+            "headers": [
+              {
+                "name": "x-customer-id",
+                "value": ""
+              },
+              {
+                "name": "Idempotency-Key",
+                "value": ""
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Import up to 500 leads in one request. Requires the `public_api:leads:write` scope. Uploaded leads are inert (no downstream automation). Use `dry_run: true` to preview, `on_duplicate` to control merge behavior, and `Idempotency-Key` to make retries safe. Subject to a stricter per-minute rate limit than the other endpoints."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

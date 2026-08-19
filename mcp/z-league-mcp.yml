@@ -2,10 +2,9 @@ generated: '2026-07-21'
 method: derived
 status: candidate
 source: openapi/z-league-crm-lead-openapi.json
-note: >-
-  No official hosted/remote MCP server was found for MEGA / Z League during enrichment.
-  This is a CANDIDATE tool list derived one-tool-per-operation from the MEGA public CRM
-  Lead API OpenAPI, for a future MCP server. Not an authoritative provider claim.
+note: No official hosted/remote MCP server was found for MEGA / Z League during enrichment. This is a
+  CANDIDATE tool list derived one-tool-per-operation from the MEGA public CRM Lead API OpenAPI, for a
+  future MCP server. Not an authoritative provider claim.
 server:
   name: mega-crm-lead
   transport: http
@@ -40,3 +39,9 @@ tools:
   description: Soft-delete a webhook.
   source_operation: openapi/z-league-crm-lead-openapi.json#deleteWebhook
   scope: public_api:webhooks:manage
+deployment:
+  mode: none
+  verified: derived
+  tools: 7
+  checked: '2026-08-12'
+  source: catalog MCP census
