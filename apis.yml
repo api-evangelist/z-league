@@ -44,6 +44,16 @@ tags:
 - AI Agents
 - SEO
 - Advertising
+- Webhook
+- Gaming
+tags_raw:
+- Company
+- CRM
+- Leads
+- Marketing
+- AI Agents
+- SEO
+- Advertising
 - Webhooks
 - Gaming
 maintainers:
@@ -97,6 +107,8 @@ apis:
   humanURL: https://docs.gomega.ai
   baseURL: https://app.gomega.ai
   tags:
+  - Webhook
+  tags_raw:
   - Webhooks
   properties:
   - type: OpenAPI
