@@ -1,0 +1,25 @@
+slug: z-league
+provider: Z League
+generated_by: planning/capability-mapping/scripts/classify_capabilities.py
+model: claude-opus-5
+frame:
+- Media, Entertainment & Telecom Content
+min_confidence: 0.7
+capability_model:
+  source: https://github.com/vincentmakes/turbo-ea-capabilities
+  license: CC-BY-4.0
+  attribution: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities,
+    CC BY 4.0
+  notice: NOTICE
+edge_count: 1
+edges:
+- tag: Leads
+  spec_file: z-league-leads-api-openapi.yml
+  capability_id: BC-410.30
+  capability_id_l1: BC-410
+  capability_name: Opportunity & Pipeline Management
+  confidence: 0.78
+  evidence: GET /api/agents/crm/leads 'List / search leads'; POST 'Create a single lead'; schemas Lead,
+    Stage, SourcePlatform, Owner
+  reason: CRM lead records with pipeline stage, source and owner — lead lifecycle management within sales
+    pipeline. Some ambiguity with customer data management, but Stage/Owner point to pipeline.

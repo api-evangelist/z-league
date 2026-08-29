@@ -150,6 +150,9 @@ apis:
   - type: AgenticAccess
     url: agentic-access/z-league-agentic-access.yml
 common:
+- type: CapabilityMap
+  url: capabilities/z-league-capability-edges.yml
+  name: Z League Business Capability Map
 - type: MCPServer
   url: mcp/z-league-mcp.yml
 - type: Overlay
