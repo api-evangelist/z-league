@@ -5,6 +5,17 @@ info:
   description: >-
     Poll the MEGA CRM for leads with stable keyset cursor pagination: fetch the first
     page sorted by updated_at ascending, then follow next_cursor to fetch the next page.
+  x-realizes-capability-ids:
+  - BC-410.30
+  x-capability-derivation:
+    method: 'deterministic join: sourceDescriptions -> per-tag OpenAPI -> tag/capability edge. No classification at this step.'
+    min_confidence: 0.7
+    sources:
+    - capability_id: BC-410.30
+      capability_name: Opportunity & Pipeline Management
+      spec: z-league-leads-api-openapi.yml
+      confidence: 0.78
+    model: Turbo EA Capabilities by Vincent Verdet — Turbo EA, https://github.com/vincentmakes/turbo-ea-capabilities, CC BY 4.0
 sourceDescriptions:
 - name: leadsApi
   url: ../openapi/z-league-leads-api-openapi.yml
