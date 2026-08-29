@@ -6,8 +6,8 @@ info:
     Poll the MEGA CRM for leads with stable keyset cursor pagination: fetch the first
     page sorted by updated_at ascending, then follow next_cursor to fetch the next page.
 sourceDescriptions:
-- name: megaCrmLead
-  url: ../openapi/z-league-crm-lead-openapi.json
+- name: leadsApi
+  url: ../openapi/z-league-leads-api-openapi.yml
   type: openapi
 workflows:
 - workflowId: incrementalLeadSync

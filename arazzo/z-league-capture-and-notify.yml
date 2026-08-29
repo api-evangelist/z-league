@@ -6,8 +6,11 @@ info:
     Register a lead.created webhook, then create a lead. Real inserts fire the webhook so
     your endpoint is notified. Uses an Idempotency-Key so the create is retry-safe.
 sourceDescriptions:
-- name: megaCrmLead
-  url: ../openapi/z-league-crm-lead-openapi.json
+- name: leadsApi
+  url: ../openapi/z-league-leads-api-openapi.yml
+  type: openapi
+- name: webhooksApi
+  url: ../openapi/z-league-webhooks-api-openapi.yml
   type: openapi
 workflows:
 - workflowId: captureAndNotify
