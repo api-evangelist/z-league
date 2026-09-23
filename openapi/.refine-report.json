@@ -1,8 +1,7 @@
 {
   "provider": "z-league",
   "sources": [
-    "z-league-leads-api-openapi.yml",
-    "z-league-webhooks-api-openapi.yml"
+    "_original/z-league-crm-lead-openapi.json"
   ],
   "outputs": [
     "z-league-leads-api-openapi.yml",
@@ -11,6 +10,15 @@
   "archived": [],
   "errors": [],
   "warnings": [],
-  "notes": [],
-  "skipped": []
+  "notes": [
+    "sourced from openapi/_original/ (1 archived document(s)); previously refined output at the top level was skipped rather than re-split",
+    "z-league-crm-lead-openapi.json: upgraded openapi 3.1.0 -> OpenAPI 3.2.0",
+    "z-league-crm-lead-openapi.json: declared missing tag: Leads",
+    "z-league-crm-lead-openapi.json: declared missing tag: Webhooks",
+    "apis.yml register: already-registered"
+  ],
+  "skipped": [
+    "z-league-leads-api-openapi.yml: previously refined output, superseded by openapi/_original/",
+    "z-league-webhooks-api-openapi.yml: previously refined output, superseded by openapi/_original/"
+  ]
 }

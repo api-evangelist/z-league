@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: MEGA Public CRM Lead Leads Webhooks API
+  title: MEGA Public CRM Lead Webhooks API
   version: 1.0.0
   description: 'Server-to-server API to pull leads, push leads (single + bulk), and manage lead webhooks for your MEGA CRM. Authenticate with an admin-issued Personal Access Token (`Authorization: Bearer mega_...`) plus the `x-customer-id` header. These are secret-key endpoints — call them from your backend, never from a browser.'
 servers:
@@ -160,70 +160,53 @@ paths:
         '429':
           $ref: '#/components/responses/RateLimited'
 components:
-  parameters:
-    CustomerId:
-      name: x-customer-id
-      in: header
-      required: true
-      schema:
-        type: string
-        format: uuid
-      description: The customer this request acts on. Must match the customer your key is locked to.
-  headers:
-    RateLimitReset:
-      description: Seconds until the window fully refills.
-      schema:
-        type: integer
-    RetryAfter:
-      description: Seconds to wait before retrying (on 429).
-      schema:
-        type: integer
-    RateLimitRemaining:
-      description: Requests remaining in the window.
-      schema:
-        type: integer
-    RateLimitLimit:
-      description: Request quota for the reported window.
-      schema:
-        type: integer
+  responses:
+    Forbidden:
+      description: Key lacks the required scope, or is locked to a different customer.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Rate limit exceeded.
+      headers:
+        RateLimit-Limit:
+          $ref: '#/components/headers/RateLimitLimit'
+        RateLimit-Remaining:
+          $ref: '#/components/headers/RateLimitRemaining'
+        RateLimit-Reset:
+          $ref: '#/components/headers/RateLimitReset'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Idempotency-Key reused with a different body, or duplicate resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid token / `x-customer-id`.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   schemas:
-    Webhook:
-      type: object
-      properties:
-        id:
-          type: string
-        url:
-          type: string
-          format: uri
-        event_types:
-          type: array
-          items:
-            type: string
-        is_active:
-          type: boolean
-        timeout_seconds:
-          type: integer
-        retry_attempts:
-          type: integer
-        description:
-          type:
-          - string
-          - 'null'
-        created_at:
-          type: string
-          format: date-time
-        updated_at:
-          type: string
-          format: date-time
-      required:
-      - id
-      - url
-      - event_types
-      - is_active
-      - timeout_seconds
-      - retry_attempts
-      - created_at
-      - updated_at
     Error:
       type: object
       properties:
@@ -312,52 +295,69 @@ components:
         rotate_secret:
           type: boolean
           description: When true, a fresh signing secret is minted and returned once.
-  responses:
-    Unauthorized:
-      description: Missing or invalid token / `x-customer-id`.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    BadRequest:
-      description: Invalid request.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Resource not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Forbidden:
-      description: Key lacks the required scope, or is locked to a different customer.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Conflict:
-      description: Idempotency-Key reused with a different body, or duplicate resource.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    RateLimited:
-      description: Rate limit exceeded.
-      headers:
-        RateLimit-Limit:
-          $ref: '#/components/headers/RateLimitLimit'
-        RateLimit-Remaining:
-          $ref: '#/components/headers/RateLimitRemaining'
-        RateLimit-Reset:
-          $ref: '#/components/headers/RateLimitReset'
-        Retry-After:
-          $ref: '#/components/headers/RetryAfter'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+        url:
+          type: string
+          format: uri
+        event_types:
+          type: array
+          items:
+            type: string
+        is_active:
+          type: boolean
+        timeout_seconds:
+          type: integer
+        retry_attempts:
+          type: integer
+        description:
+          type:
+          - string
+          - 'null'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+      - id
+      - url
+      - event_types
+      - is_active
+      - timeout_seconds
+      - retry_attempts
+      - created_at
+      - updated_at
+  headers:
+    RateLimitRemaining:
+      description: Requests remaining in the window.
+      schema:
+        type: integer
+    RetryAfter:
+      description: Seconds to wait before retrying (on 429).
+      schema:
+        type: integer
+    RateLimitLimit:
+      description: Request quota for the reported window.
+      schema:
+        type: integer
+    RateLimitReset:
+      description: Seconds until the window fully refills.
+      schema:
+        type: integer
+  parameters:
+    CustomerId:
+      name: x-customer-id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The customer this request acts on. Must match the customer your key is locked to.
   securitySchemes:
     bearerAuth:
       type: http
