@@ -160,52 +160,6 @@ paths:
         '429':
           $ref: '#/components/responses/RateLimited'
 components:
-  responses:
-    Forbidden:
-      description: Key lacks the required scope, or is locked to a different customer.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    RateLimited:
-      description: Rate limit exceeded.
-      headers:
-        RateLimit-Limit:
-          $ref: '#/components/headers/RateLimitLimit'
-        RateLimit-Remaining:
-          $ref: '#/components/headers/RateLimitRemaining'
-        RateLimit-Reset:
-          $ref: '#/components/headers/RateLimitReset'
-        Retry-After:
-          $ref: '#/components/headers/RetryAfter'
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    BadRequest:
-      description: Invalid request.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Resource not found.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Conflict:
-      description: Idempotency-Key reused with a different body, or duplicate resource.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Missing or invalid token / `x-customer-id`.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
   schemas:
     Error:
       type: object
@@ -232,40 +186,6 @@ components:
           - message
       required:
       - error
-    WebhookCreateRequest:
-      type: object
-      properties:
-        url:
-          type: string
-          format: uri
-          description: Public HTTPS URL. Validated against SSRF before it is stored.
-        event_types:
-          type: array
-          items:
-            type: string
-            enum:
-            - lead.created
-          default:
-          - lead.created
-        timeout_seconds:
-          type: integer
-          minimum: 1
-          maximum: 60
-          default: 10
-        retry_attempts:
-          type: integer
-          minimum: 0
-          maximum: 10
-          default: 5
-        description:
-          type:
-          - string
-          - 'null'
-        is_active:
-          type: boolean
-          default: true
-      required:
-      - url
     WebhookUpdateRequest:
       type: object
       properties:
@@ -332,7 +252,91 @@ components:
       - retry_attempts
       - created_at
       - updated_at
+    WebhookCreateRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public HTTPS URL. Validated against SSRF before it is stored.
+        event_types:
+          type: array
+          items:
+            type: string
+            enum:
+            - lead.created
+          default:
+          - lead.created
+        timeout_seconds:
+          type: integer
+          minimum: 1
+          maximum: 60
+          default: 10
+        retry_attempts:
+          type: integer
+          minimum: 0
+          maximum: 10
+          default: 5
+        description:
+          type:
+          - string
+          - 'null'
+        is_active:
+          type: boolean
+          default: true
+      required:
+      - url
+  responses:
+    Conflict:
+      description: Idempotency-Key reused with a different body, or duplicate resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Key lacks the required scope, or is locked to a different customer.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Missing or invalid token / `x-customer-id`.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Rate limit exceeded.
+      headers:
+        RateLimit-Limit:
+          $ref: '#/components/headers/RateLimitLimit'
+        RateLimit-Remaining:
+          $ref: '#/components/headers/RateLimitRemaining'
+        RateLimit-Reset:
+          $ref: '#/components/headers/RateLimitReset'
+        Retry-After:
+          $ref: '#/components/headers/RetryAfter'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
   headers:
+    RateLimitReset:
+      description: Seconds until the window fully refills.
+      schema:
+        type: integer
     RateLimitRemaining:
       description: Requests remaining in the window.
       schema:
@@ -343,10 +347,6 @@ components:
         type: integer
     RateLimitLimit:
       description: Request quota for the reported window.
-      schema:
-        type: integer
-    RateLimitReset:
-      description: Seconds until the window fully refills.
       schema:
         type: integer
   parameters:

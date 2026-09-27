@@ -206,6 +206,175 @@ paths:
           $ref: '#/components/responses/RateLimited'
 components:
   schemas:
+    Owner:
+      type:
+      - object
+      - 'null'
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        role_name:
+          type:
+          - string
+          - 'null'
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - authentication_error
+              - authorization_error
+              - invalid_request_error
+              - not_found_error
+              - rate_limit_error
+              - api_error
+            code:
+              type: integer
+            message:
+              type: string
+          required:
+          - type
+          - code
+          - message
+      required:
+      - error
+    BulkLeadRow:
+      type: object
+      description: At least one of contact_name, contact_phone, contact_email is required.
+      properties:
+        row_ref:
+          type: string
+          description: Your correlation id, echoed back in the per-row result.
+        contact_name:
+          type: string
+        contact_phone:
+          type: string
+        contact_email:
+          type: string
+          format: email
+        source_platform:
+          $ref: '#/components/schemas/SourcePlatform'
+        source_type:
+          $ref: '#/components/schemas/SourceType'
+        stage_slug:
+          type: string
+        owner_id:
+          type: string
+          format: uuid
+          description: Must be one of the customer's team members.
+        lead_line:
+          type: string
+          enum:
+          - buyer
+          - seller
+        custom_fields:
+          $ref: '#/components/schemas/CustomFieldMap'
+    BulkImportRequest:
+      type: object
+      properties:
+        leads:
+          type: array
+          minItems: 1
+          maxItems: 500
+          items:
+            $ref: '#/components/schemas/BulkLeadRow'
+        on_duplicate:
+          type: string
+          enum:
+          - update
+          - skip
+          default: update
+        dry_run:
+          type: boolean
+          default: false
+      required:
+      - leads
+    BulkImportResponse:
+      type: object
+      properties:
+        dry_run:
+          type: boolean
+        summary:
+          type: object
+          properties:
+            total:
+              type: integer
+            created:
+              type: integer
+            updated:
+              type: integer
+            skipped:
+              type: integer
+            failed:
+              type: integer
+          required:
+          - total
+          - created
+          - updated
+          - skipped
+          - failed
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BulkRowResult'
+        unknown_custom_fields:
+          type: array
+          items:
+            type: string
+          description: Custom-field slugs that did not match any definition and were ignored.
+      required:
+      - dry_run
+      - summary
+      - results
+      - unknown_custom_fields
+    Stage:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        name:
+          type: string
+        color:
+          type:
+          - string
+          - 'null'
+    CustomFieldMap:
+      type: object
+      description: Map of custom-field slug to a scalar value (string | number | boolean | null).
+      additionalProperties:
+        type:
+        - string
+        - number
+        - boolean
+        - 'null'
+    LeadCreateRequest:
+      type: object
+      description: At least one of contact_name, contact_phone, contact_email is required.
+      properties:
+        contact_name:
+          type: string
+        contact_phone:
+          type: string
+        contact_email:
+          type: string
+          format: email
+        source_platform:
+          $ref: '#/components/schemas/SourcePlatform'
+        source_type:
+          $ref: '#/components/schemas/SourceType'
+        stage_slug:
+          type: string
+        custom_fields:
+          $ref: '#/components/schemas/CustomFieldMap'
     SourceType:
       type: string
       enum:
@@ -216,6 +385,31 @@ components:
       - sms
       - manual
       - import
+    LeadListResponse:
+      type: object
+      properties:
+        leads:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lead'
+        total:
+          type: integer
+          description: Total matching the filter (ignores cursor/offset).
+        limit:
+          type: integer
+        offset:
+          type: integer
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Pass as `cursor` to fetch the next page; null when there are no more pages.
+      required:
+      - leads
+      - total
+      - limit
+      - offset
+      - next_cursor
     SourcePlatform:
       type: string
       enum:
@@ -291,200 +485,6 @@ components:
       - status
       - created_at
       - updated_at
-    Error:
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            type:
-              type: string
-              enum:
-              - authentication_error
-              - authorization_error
-              - invalid_request_error
-              - not_found_error
-              - rate_limit_error
-              - api_error
-            code:
-              type: integer
-            message:
-              type: string
-          required:
-          - type
-          - code
-          - message
-      required:
-      - error
-    LeadCreateRequest:
-      type: object
-      description: At least one of contact_name, contact_phone, contact_email is required.
-      properties:
-        contact_name:
-          type: string
-        contact_phone:
-          type: string
-        contact_email:
-          type: string
-          format: email
-        source_platform:
-          $ref: '#/components/schemas/SourcePlatform'
-        source_type:
-          $ref: '#/components/schemas/SourceType'
-        stage_slug:
-          type: string
-        custom_fields:
-          $ref: '#/components/schemas/CustomFieldMap'
-    BulkImportRequest:
-      type: object
-      properties:
-        leads:
-          type: array
-          minItems: 1
-          maxItems: 500
-          items:
-            $ref: '#/components/schemas/BulkLeadRow'
-        on_duplicate:
-          type: string
-          enum:
-          - update
-          - skip
-          default: update
-        dry_run:
-          type: boolean
-          default: false
-      required:
-      - leads
-    BulkLeadRow:
-      type: object
-      description: At least one of contact_name, contact_phone, contact_email is required.
-      properties:
-        row_ref:
-          type: string
-          description: Your correlation id, echoed back in the per-row result.
-        contact_name:
-          type: string
-        contact_phone:
-          type: string
-        contact_email:
-          type: string
-          format: email
-        source_platform:
-          $ref: '#/components/schemas/SourcePlatform'
-        source_type:
-          $ref: '#/components/schemas/SourceType'
-        stage_slug:
-          type: string
-        owner_id:
-          type: string
-          format: uuid
-          description: Must be one of the customer's team members.
-        lead_line:
-          type: string
-          enum:
-          - buyer
-          - seller
-        custom_fields:
-          $ref: '#/components/schemas/CustomFieldMap'
-    Stage:
-      type: object
-      nullable: true
-      properties:
-        id:
-          type: string
-        slug:
-          type: string
-        name:
-          type: string
-        color:
-          type:
-          - string
-          - 'null'
-    BulkImportResponse:
-      type: object
-      properties:
-        dry_run:
-          type: boolean
-        summary:
-          type: object
-          properties:
-            total:
-              type: integer
-            created:
-              type: integer
-            updated:
-              type: integer
-            skipped:
-              type: integer
-            failed:
-              type: integer
-          required:
-          - total
-          - created
-          - updated
-          - skipped
-          - failed
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/BulkRowResult'
-        unknown_custom_fields:
-          type: array
-          items:
-            type: string
-          description: Custom-field slugs that did not match any definition and were ignored.
-      required:
-      - dry_run
-      - summary
-      - results
-      - unknown_custom_fields
-    LeadListResponse:
-      type: object
-      properties:
-        leads:
-          type: array
-          items:
-            $ref: '#/components/schemas/Lead'
-        total:
-          type: integer
-          description: Total matching the filter (ignores cursor/offset).
-        limit:
-          type: integer
-        offset:
-          type: integer
-        next_cursor:
-          type:
-          - string
-          - 'null'
-          description: Pass as `cursor` to fetch the next page; null when there are no more pages.
-      required:
-      - leads
-      - total
-      - limit
-      - offset
-      - next_cursor
-    Owner:
-      type:
-      - object
-      - 'null'
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        role_name:
-          type:
-          - string
-          - 'null'
-    CustomFieldMap:
-      type: object
-      description: Map of custom-field slug to a scalar value (string | number | boolean | null).
-      additionalProperties:
-        type:
-        - string
-        - number
-        - boolean
-        - 'null'
     BulkRowResult:
       type: object
       properties:
@@ -528,6 +528,24 @@ components:
       - matched_by
       - errors
   responses:
+    Unauthorized:
+      description: Missing or invalid token / `x-customer-id`.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Idempotency-Key reused with a different body, or duplicate resource.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     RateLimited:
       description: Rate limit exceeded.
       headers:
@@ -543,47 +561,17 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    BadRequest:
-      description: Invalid request.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Conflict:
-      description: Idempotency-Key reused with a different body, or duplicate resource.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-    Unauthorized:
-      description: Missing or invalid token / `x-customer-id`.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
     Forbidden:
       description: Key lacks the required scope, or is locked to a different customer.
       content:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-  parameters:
-    IdempotencyKey:
-      name: Idempotency-Key
-      in: header
-      required: false
-      schema:
-        type: string
-      description: Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.
-    CustomerId:
-      name: x-customer-id
-      in: header
-      required: true
-      schema:
-        type: string
-        format: uuid
-      description: The customer this request acts on. Must match the customer your key is locked to.
   headers:
+    RateLimitRemaining:
+      description: Requests remaining in the window.
+      schema:
+        type: integer
     RateLimitReset:
       description: Seconds until the window fully refills.
       schema:
@@ -592,14 +580,26 @@ components:
       description: Seconds to wait before retrying (on 429).
       schema:
         type: integer
-    RateLimitRemaining:
-      description: Requests remaining in the window.
-      schema:
-        type: integer
     RateLimitLimit:
       description: Request quota for the reported window.
       schema:
         type: integer
+  parameters:
+    CustomerId:
+      name: x-customer-id
+      in: header
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: The customer this request acts on. Must match the customer your key is locked to.
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+      description: Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.
   securitySchemes:
     bearerAuth:
       type: http
