@@ -161,31 +161,6 @@ paths:
           $ref: '#/components/responses/RateLimited'
 components:
   schemas:
-    Error:
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            type:
-              type: string
-              enum:
-              - authentication_error
-              - authorization_error
-              - invalid_request_error
-              - not_found_error
-              - rate_limit_error
-              - api_error
-            code:
-              type: integer
-            message:
-              type: string
-          required:
-          - type
-          - code
-          - message
-      required:
-      - error
     WebhookUpdateRequest:
       type: object
       properties:
@@ -215,6 +190,40 @@ components:
         rotate_secret:
           type: boolean
           description: When true, a fresh signing secret is minted and returned once.
+    WebhookCreateRequest:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+          description: Public HTTPS URL. Validated against SSRF before it is stored.
+        event_types:
+          type: array
+          items:
+            type: string
+            enum:
+            - lead.created
+          default:
+          - lead.created
+        timeout_seconds:
+          type: integer
+          minimum: 1
+          maximum: 60
+          default: 10
+        retry_attempts:
+          type: integer
+          minimum: 0
+          maximum: 10
+          default: 5
+        description:
+          type:
+          - string
+          - 'null'
+        is_active:
+          type: boolean
+          default: true
+      required:
+      - url
     Webhook:
       type: object
       properties:
@@ -252,43 +261,34 @@ components:
       - retry_attempts
       - created_at
       - updated_at
-    WebhookCreateRequest:
+    Error:
       type: object
       properties:
-        url:
-          type: string
-          format: uri
-          description: Public HTTPS URL. Validated against SSRF before it is stored.
-        event_types:
-          type: array
-          items:
-            type: string
-            enum:
-            - lead.created
-          default:
-          - lead.created
-        timeout_seconds:
-          type: integer
-          minimum: 1
-          maximum: 60
-          default: 10
-        retry_attempts:
-          type: integer
-          minimum: 0
-          maximum: 10
-          default: 5
-        description:
-          type:
-          - string
-          - 'null'
-        is_active:
-          type: boolean
-          default: true
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - authentication_error
+              - authorization_error
+              - invalid_request_error
+              - not_found_error
+              - rate_limit_error
+              - api_error
+            code:
+              type: integer
+            message:
+              type: string
+          required:
+          - type
+          - code
+          - message
       required:
-      - url
+      - error
   responses:
-    Conflict:
-      description: Idempotency-Key reused with a different body, or duplicate resource.
+    NotFound:
+      description: Resource not found.
       content:
         application/json:
           schema:
@@ -320,8 +320,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    NotFound:
-      description: Resource not found.
+    Conflict:
+      description: Idempotency-Key reused with a different body, or duplicate resource.
       content:
         application/json:
           schema:
@@ -333,16 +333,16 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   headers:
+    RetryAfter:
+      description: Seconds to wait before retrying (on 429).
+      schema:
+        type: integer
     RateLimitReset:
       description: Seconds until the window fully refills.
       schema:
         type: integer
     RateLimitRemaining:
       description: Requests remaining in the window.
-      schema:
-        type: integer
-    RetryAfter:
-      description: Seconds to wait before retrying (on 429).
       schema:
         type: integer
     RateLimitLimit:

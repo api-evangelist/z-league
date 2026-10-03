@@ -206,6 +206,16 @@ paths:
           $ref: '#/components/responses/RateLimited'
 components:
   schemas:
+    SourceType:
+      type: string
+      enum:
+      - form
+      - phone_call
+      - email
+      - chat
+      - sms
+      - manual
+      - import
     Owner:
       type:
       - object
@@ -219,31 +229,6 @@ components:
           type:
           - string
           - 'null'
-    Error:
-      type: object
-      properties:
-        error:
-          type: object
-          properties:
-            type:
-              type: string
-              enum:
-              - authentication_error
-              - authorization_error
-              - invalid_request_error
-              - not_found_error
-              - rate_limit_error
-              - api_error
-            code:
-              type: integer
-            message:
-              type: string
-          required:
-          - type
-          - code
-          - message
-      required:
-      - error
     BulkLeadRow:
       type: object
       description: At least one of contact_name, contact_phone, contact_email is required.
@@ -275,26 +260,6 @@ components:
           - seller
         custom_fields:
           $ref: '#/components/schemas/CustomFieldMap'
-    BulkImportRequest:
-      type: object
-      properties:
-        leads:
-          type: array
-          minItems: 1
-          maxItems: 500
-          items:
-            $ref: '#/components/schemas/BulkLeadRow'
-        on_duplicate:
-          type: string
-          enum:
-          - update
-          - skip
-          default: update
-        dry_run:
-          type: boolean
-          default: false
-      required:
-      - leads
     BulkImportResponse:
       type: object
       properties:
@@ -333,29 +298,26 @@ components:
       - summary
       - results
       - unknown_custom_fields
-    Stage:
+    BulkImportRequest:
       type: object
-      nullable: true
       properties:
-        id:
+        leads:
+          type: array
+          minItems: 1
+          maxItems: 500
+          items:
+            $ref: '#/components/schemas/BulkLeadRow'
+        on_duplicate:
           type: string
-        slug:
-          type: string
-        name:
-          type: string
-        color:
-          type:
-          - string
-          - 'null'
-    CustomFieldMap:
-      type: object
-      description: Map of custom-field slug to a scalar value (string | number | boolean | null).
-      additionalProperties:
-        type:
-        - string
-        - number
-        - boolean
-        - 'null'
+          enum:
+          - update
+          - skip
+          default: update
+        dry_run:
+          type: boolean
+          default: false
+      required:
+      - leads
     LeadCreateRequest:
       type: object
       description: At least one of contact_name, contact_phone, contact_email is required.
@@ -375,56 +337,6 @@ components:
           type: string
         custom_fields:
           $ref: '#/components/schemas/CustomFieldMap'
-    SourceType:
-      type: string
-      enum:
-      - form
-      - phone_call
-      - email
-      - chat
-      - sms
-      - manual
-      - import
-    LeadListResponse:
-      type: object
-      properties:
-        leads:
-          type: array
-          items:
-            $ref: '#/components/schemas/Lead'
-        total:
-          type: integer
-          description: Total matching the filter (ignores cursor/offset).
-        limit:
-          type: integer
-        offset:
-          type: integer
-        next_cursor:
-          type:
-          - string
-          - 'null'
-          description: Pass as `cursor` to fetch the next page; null when there are no more pages.
-      required:
-      - leads
-      - total
-      - limit
-      - offset
-      - next_cursor
-    SourcePlatform:
-      type: string
-      enum:
-      - google_ads
-      - meta_ads
-      - google_organic
-      - direct
-      - referral
-      - hubspot
-      - zoho
-      - ghl
-      - shopify
-      - zenmaid
-      - lead_docket
-      - salesforce
     Lead:
       type: object
       properties:
@@ -527,7 +439,118 @@ components:
       - lead_id
       - matched_by
       - errors
+    Error:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            type:
+              type: string
+              enum:
+              - authentication_error
+              - authorization_error
+              - invalid_request_error
+              - not_found_error
+              - rate_limit_error
+              - api_error
+            code:
+              type: integer
+            message:
+              type: string
+          required:
+          - type
+          - code
+          - message
+      required:
+      - error
+    LeadListResponse:
+      type: object
+      properties:
+        leads:
+          type: array
+          items:
+            $ref: '#/components/schemas/Lead'
+        total:
+          type: integer
+          description: Total matching the filter (ignores cursor/offset).
+        limit:
+          type: integer
+        offset:
+          type: integer
+        next_cursor:
+          type:
+          - string
+          - 'null'
+          description: Pass as `cursor` to fetch the next page; null when there are no more pages.
+      required:
+      - leads
+      - total
+      - limit
+      - offset
+      - next_cursor
+    CustomFieldMap:
+      type: object
+      description: Map of custom-field slug to a scalar value (string | number | boolean | null).
+      additionalProperties:
+        type:
+        - string
+        - number
+        - boolean
+        - 'null'
+    Stage:
+      type: object
+      nullable: true
+      properties:
+        id:
+          type: string
+        slug:
+          type: string
+        name:
+          type: string
+        color:
+          type:
+          - string
+          - 'null'
+    SourcePlatform:
+      type: string
+      enum:
+      - google_ads
+      - meta_ads
+      - google_organic
+      - direct
+      - referral
+      - hubspot
+      - zoho
+      - ghl
+      - shopify
+      - zenmaid
+      - lead_docket
+      - salesforce
+  headers:
+    RetryAfter:
+      description: Seconds to wait before retrying (on 429).
+      schema:
+        type: integer
+    RateLimitLimit:
+      description: Request quota for the reported window.
+      schema:
+        type: integer
+    RateLimitRemaining:
+      description: Requests remaining in the window.
+      schema:
+        type: integer
+    RateLimitReset:
+      description: Seconds until the window fully refills.
+      schema:
+        type: integer
   responses:
+    BadRequest:
+      description: Invalid request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
     Unauthorized:
       description: Missing or invalid token / `x-customer-id`.
       content:
@@ -540,8 +563,8 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    BadRequest:
-      description: Invalid request.
+    Forbidden:
+      description: Key lacks the required scope, or is locked to a different customer.
       content:
         application/json:
           schema:
@@ -561,30 +584,14 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
-    Forbidden:
-      description: Key lacks the required scope, or is locked to a different customer.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-  headers:
-    RateLimitRemaining:
-      description: Requests remaining in the window.
-      schema:
-        type: integer
-    RateLimitReset:
-      description: Seconds until the window fully refills.
-      schema:
-        type: integer
-    RetryAfter:
-      description: Seconds to wait before retrying (on 429).
-      schema:
-        type: integer
-    RateLimitLimit:
-      description: Request quota for the reported window.
-      schema:
-        type: integer
   parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      schema:
+        type: string
+      description: Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.
     CustomerId:
       name: x-customer-id
       in: header
@@ -593,13 +600,6 @@ components:
         type: string
         format: uuid
       description: The customer this request acts on. Must match the customer your key is locked to.
-    IdempotencyKey:
-      name: Idempotency-Key
-      in: header
-      required: false
-      schema:
-        type: string
-      description: Client-generated unique key. Replaying the same key returns the original stored response instead of creating duplicates. Scoped per customer + endpoint; reuse with a different body returns 409.
   securitySchemes:
     bearerAuth:
       type: http
