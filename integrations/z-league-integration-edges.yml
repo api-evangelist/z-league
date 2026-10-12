@@ -1,0 +1,16 @@
+generated: '2026-10-12'
+method: none
+source:
+- https://zapier.com/apps/z-league/integrations
+- https://n8n.io/integrations/z-league/
+- https://composio.dev/toolkits/z-league
+- https://monid.ai/tools/z-league
+checked:
+- https://composio.dev/toolkits/z-league
+- https://monid.ai/tools/z-league
+- https://n8n.io/integrations/z-league/
+- https://zapier.com/apps/z-league/integrations
+summary: null
+marketplace_apps: []
+edges: []
+templates: []
